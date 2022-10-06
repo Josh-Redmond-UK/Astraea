@@ -219,7 +219,7 @@ class Area_Analysis(ee.ImageCollection):
         <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
         <body>
-        <a download="{title+'.zip'}" href="data:text/csv;base64,{generate_and_serve_zip_payload(images_list, (min_lon, max_lon, min_lat, max_lat), self.bands, title, dates, image_mode, area_string, [self.gif_path], self.framesPath)}" download>
+        <a download="{title+'.zip'}" href="data:text/csv;base64,{generate_and_serve_zip_payload(images_list, (min_lon, max_lon, min_lat, max_lat), self.bands, title, dates, image_mode, area_string, additional_paths=[self.gif_path], framesPath = self.framesPath)}" download>
         <button class="p-Widget jupyter-widgets jupyter-button widget-button mod-warning">Download File</button>
         </a>
         </body>
@@ -387,12 +387,12 @@ def get_imagecollection_download(img_col):
 
 
 
-def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, area_string, frame_paths):
+def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, area_string, framesPath):
     min_lon, max_lon, min_lat, max_lat = bounds_tuple
-
+    #print(framesPath)
     downloaded_images = []
     arrays = []
-    for f in frame_paths:
+    for f in framesPath:
         array = tifffile.imread(f)
         #print(array.shape)
         for band in range(array.shape[2]):
@@ -416,12 +416,12 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
         title = f"{area_string}, {dates[idx]}, {image_mode}"
         test_extent = (min_lon-x_buffer, max_lon+x_buffer, min_lat-x_buffer, max_lat+x_buffer)
         #axes[idx] = plt.axes(projection=ccrs.PlateCarree())
-        axes[idx].stock_img()
+        axes[idx]#.stock_img()
         axes[idx].imshow(ar, extent=img_extent)
-        axes[idx].set_extent(test_extent)
-        lines = axes[idx].gridlines(draw_labels=True, alpha=0.5, ls="--")
-        lines.xlabels_top = False
-        lines.ylabels_right = False
+        #axes[idx].set_extent(test_extent)
+        #lines = axes[idx].gridlines(draw_labels=True, alpha=0.5, ls="--")
+        #lines.xlabels_top = False
+        #lines.ylabels_right = False
         axes[idx].title.set_text(title)
     
     nrows = len(arrays)
@@ -438,12 +438,12 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
         title = f"{area_string}, {dates[idx]}, {image_mode}"
         test_extent = (min_lon-x_buffer, max_lon+x_buffer, min_lat-y_buffer, max_lat+y_buffer)
         #axes[idx] = plt.axes(projection=ccrs.PlateCarree())
-        axes[idx].stock_img()
+        axes[idx]#.stock_img()
         axes[idx].imshow(ar, extent=img_extent)
-        axes[idx].set_extent(test_extent)
-        lines = axes[idx].gridlines(draw_labels=True, alpha=0.5, ls="--")
-        lines.xlabels_top = False
-        lines.ylabels_right = False
+        #axes[idx].set_extent(test_extent)
+        #lines = axes[idx].gridlines(draw_labels=True, alpha=0.5, ls="--")
+        #lines.xlabels_top = False
+        #lines.ylabels_right = False
         axes[idx].title.set_text(title)
 
     pdf_path = title+".pdf"
