@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import requests
 import shutil
 import tifffile
-import cartopy.crs as ccrs
+#import cartopy.crs as ccrs
 import base64
 from zipfile import ZipFile
 import glob
@@ -403,7 +403,7 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
 
 
     nrows = len(arrays)
-    fig, axes = plt.subplots(figsize=(16.5, 11.75*nrows), nrows=nrows,subplot_kw={"projection": ccrs.PlateCarree()})
+    fig, axes = plt.subplots(figsize=(16.5, 11.75*nrows), nrows=nrows)
 
     axes = axes.flatten()
     for idx, ar in enumerate(arrays):
@@ -417,7 +417,7 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
         test_extent = (min_lon-x_buffer, max_lon+x_buffer, min_lat-x_buffer, max_lat+x_buffer)
         #axes[idx] = plt.axes(projection=ccrs.PlateCarree())
         axes[idx].stock_img()
-        axes[idx].imshow(ar, extent=img_extent, transform=ccrs.PlateCarree())
+        axes[idx].imshow(ar, extent=img_extent)
         axes[idx].set_extent(test_extent)
         lines = axes[idx].gridlines(draw_labels=True, alpha=0.5, ls="--")
         lines.xlabels_top = False
@@ -425,7 +425,7 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
         axes[idx].title.set_text(title)
     
     nrows = len(arrays)
-    fig, axes = plt.subplots(figsize=(16.5, 11.75*nrows), nrows=nrows,subplot_kw={"projection": ccrs.PlateCarree()})
+    fig, axes = plt.subplots(figsize=(16.5, 11.75*nrows), nrows=nrows)
 
     axes = axes.flatten()
     for idx, ar in enumerate(arrays):
@@ -439,7 +439,7 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
         test_extent = (min_lon-x_buffer, max_lon+x_buffer, min_lat-y_buffer, max_lat+y_buffer)
         #axes[idx] = plt.axes(projection=ccrs.PlateCarree())
         axes[idx].stock_img()
-        axes[idx].imshow(ar, extent=img_extent, transform=ccrs.PlateCarree())
+        axes[idx].imshow(ar, extent=img_extent)
         axes[idx].set_extent(test_extent)
         lines = axes[idx].gridlines(draw_labels=True, alpha=0.5, ls="--")
         lines.xlabels_top = False
