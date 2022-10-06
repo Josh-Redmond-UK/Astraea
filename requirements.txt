@@ -9,3 +9,6 @@ voila
 geopy
 tifffile
 matplotlib
+imageio
+cartopy
+tifffile
