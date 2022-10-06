@@ -10,4 +10,3 @@ geopy
 tifffile
 matplotlib
 imageio
-tifffile
