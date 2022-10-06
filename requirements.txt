@@ -8,5 +8,4 @@ geemap
 voila 
 geopy
 tifffile
-zipfile
 matplotlib
