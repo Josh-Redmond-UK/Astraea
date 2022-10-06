@@ -1,0 +1,12 @@
+pandas
+ipywidgets
+numpy
+ipyleaflet
+shapely
+geojson
+geemap
+voila 
+geopy
+tifffile
+zipfile
+matplotlib
