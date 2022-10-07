@@ -78,11 +78,11 @@ def add_NBR(image):
     return image.cat(get_NBR(image), image.select("B3").divide(10000), image.select("B2").divide(10000))
 
 def get_NDWI(image):
-    NDWI = image.normalizedDifference(['B3', 'B8']).rename("constant")
+    NDWI = image.normalizedDifference(['B3', 'B8']).rename("NDWI")
     return NDWI
 
 def get_NDBI(image):
-    NDBI = image.normalizedDifference(['B11', 'B8']).rename("constant")
+    NDBI = image.normalizedDifference(['B11', 'B8']).rename("NDBI")
     return NDBI
 
 def get_Green_Grey_Blue_Index(image):
@@ -91,7 +91,7 @@ def get_Green_Grey_Blue_Index(image):
     blue = get_NDWI(image).rename("blue")
 
     return red.addBands([green, blue])
-    
+
 
 
 
