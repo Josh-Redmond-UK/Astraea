@@ -16,6 +16,7 @@ import glob
 from tifffile.tifffile import TiffSequence
 from IPython.core.display import display
 import calendar
+import os.path
 
 def clean_up_wd():
     tiffs = glob.glob("*.tif")
@@ -231,7 +232,7 @@ class Area_Analysis(ee.ImageCollection):
         <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
         <body>
-        <a download="{title+'.zip'}" href="data:text/csv;base64,{generate_and_serve_zip_payload(images_list, (min_lon, max_lon, min_lat, max_lat), self.bands, title, dates, image_mode, area_string, additional_paths=[self.gif_path], framesPath = self.framesPath)}" download>
+        <a download="{os.path.dirname(__file__) +'/../../../'+title+'.zip'}" href="data:text/csv;base64,{generate_and_serve_zip_payload(images_list, (min_lon, max_lon, min_lat, max_lat), self.bands, title, dates, image_mode, area_string, additional_paths=[self.gif_path], framesPath = self.framesPath)}" download>
         <button class="p-Widget jupyter-widgets jupyter-button widget-button mod-warning">Download File</button>
         </a>
         </body>
@@ -389,8 +390,8 @@ def get_imagecollection_download(img_col):
         test_r = requests.get(test_url, stream=True)
         print(test_url)
         #print(test_url)
-        #print(test_r)
-        path = 'frame'+str(idx)+'.tif'
+        #print(test_r)v os.path.dirname(__file__) + f'/../../../'
+        path = os.path.dirname(__file__) + '/../../../'+'frame'+str(idx)+'.tif'
         assert test_r.status_code == 200
         with open(path, 'wb') as f:
             test_r.raw.decode_content = True
@@ -457,8 +458,8 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
         #lines.xlabels_top = False
         #lines.ylabels_right = False
         axes[idx].title.set_text(title)
-
-    pdf_path = title+".pdf"
+    #path = os.path.dirname(__file__) + f'/../../../'
+    pdf_path =  os.path.dirname(__file__) + f'/../../../'+title+".pdf"
     fig.savefig(pdf_path, orientation="landscape")
     plt.close()
     return [pdf_path, *downloaded_images]
@@ -466,7 +467,7 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
 
     
 def generate_zip(paths, title):
-    zip_path = title+'.zip'
+    zip_path = os.path.dirname(__file__) + '/../../../'+title+'.zip'
 
     with ZipFile(zip_path, 'w') as zipObj2:
         # Adds the pdf map, geotiffs and video to a zip file
@@ -498,7 +499,9 @@ def get_imagecollection_download(img_col):
         test_r = requests.get(test_url, stream=True)
         #print(test_url)
         #print(test_r)
-        path = 'frame'+str(idx)+'.tif'
+        path = os.path.dirname(__file__) + f'/../../../{idx}.tif'
+
+        #path = './frame'+str(idx)+'.tif'
         print( test_r.status_code)
         assert test_r.status_code == 200
         with open(path, 'wb') as f:
@@ -512,7 +515,7 @@ def get_imagecollection_download(img_col):
 def create_gif(frame_paths, title, fps=1):
     images = [imageio.imread(path) for path in frame_paths]
     images = [np.clip(i/np.max(i)*255, 0, 255).astype(np.uint8) for i in images]
-    gif_title = f'{title}.gif'
+    gif_title = os.path.dirname(__file__) + f'/../../../{title}.gif'
     imageio.mimsave(gif_title, images, fps=1)
     
 def download_gif(img_col, title="Animation", fps=1):
