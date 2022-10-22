@@ -274,8 +274,8 @@ def downscale_image(image, max_image_size = 1280):
 #def reproject_imgcol()
 
 
-def aggregate_monthly(img_col, mode="Mean"):
-    datelist = ymdList(img_col)
+def aggregate_monthly(img_col, datelist, mode="Mean"):
+    #datelist = ymdList(img_col)
     dates_conv = pd.to_datetime(datelist, dayfirst=False)
     months = []
     for d in dates_conv:
@@ -324,8 +324,8 @@ def aggregate_monthly(img_col, mode="Mean"):
                         
 
 
-def aggregate_anually(img_col, mode="Mean"):
-    datelist = ymdList(img_col)
+def aggregate_anually(img_col, datelist, mode="Mean"):
+    #datelist = ymdList(img_col)
     dates_conv = pd.to_datetime(datelist, dayfirst=False)
     years = []
     for d in dates_conv:
