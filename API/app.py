@@ -2,6 +2,7 @@ from flask import Flask
 from flask import request, jsonify
 from src import utils
 import ee
+from ipyleaflet import Map, basemaps, basemap_to_tiles
 
 ee.Initialize()
 
@@ -25,18 +26,19 @@ def api_all():
 @app.route('/api/mapping', methods=['GET'])
 def GetImagery():
 
-    imageType = request.args['ImageType']
+   # imageType = request.args['ImageType']
+   # startDate = request.args['startDate']
+   # endDate = request.args['endDate']
+   # aggregationType = request.args['aggType']
+   # aggregationLength = request.args['aggLen']
+   # geomJson = request.args["geom"]
+    
+   # roi = ee.Geometry.Polygon(geomJson)
+    m = Map(
+    basemap=basemap_to_tiles(basemaps.NASAGIBS.ModisTerraTrueColorCR, "2017-04-08"),
+    center=(52.204793, 360.121558),
+    zoom=4)
 
-    # Check if an ID was provided as part of the URL.
-    # If ID is provided, assign it to a variable.
-    # If no ID is provided, display an error in the browser.
-    if 'id' in request.args:
-        id = int(request.args['id'])
-    else:
-        return "Error: No id field provided. Please specify an id."
+    
 
-
-
-    # Use the jsonify function from Flask to convert our list of
-    # Python dictionaries to the JSON format.
     return str(id * 100)
