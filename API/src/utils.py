@@ -70,8 +70,8 @@ def get_NBR(image):
     return nbr_3
 
 def add_NBR(image):
-    return image.cat(get_NBR(image), image.select("B3").divide(10000), image.select("B2").divide(10000))
-
+    return image.addBands([get_NBR(image)]).select(["constant", "B3", "B2"])
+    
 def get_NDWI(image):
     NDWI = image.normalizedDifference(['B3', 'B8']).rename("NDWI")
     return NDWI
@@ -96,7 +96,8 @@ def get_NDVI(image):
 
 
 def add_NDVI(image):
-    return image.cat(image.select("B4").divide(10000), get_NDVI(image), image.select("B2").divide(10000))
+    return image.addBands([get_NDVI(image)]).select(["B4","constant", "B2"])
+    
 
 
 
