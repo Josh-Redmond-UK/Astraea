@@ -232,7 +232,7 @@ class Area_Analysis(ee.ImageCollection):
         <meta name="viewport" content="width=device-width, initial-scale=1">
         </head>
         <body>
-        <a download="{os.path.dirname(__file__) +'/../../../'+title+'.zip'}" href="data:text/csv;base64,{generate_and_serve_zip_payload(images_list, (min_lon, max_lon, min_lat, max_lat), self.bands, title, dates, image_mode, area_string, additional_paths=[self.gif_path], framesPath = self.framesPath)}" download>
+        <a download="{title+'.zip'}" href="data:text/csv;base64,{generate_and_serve_zip_payload(images_list, (min_lon, max_lon, min_lat, max_lat), self.bands, title, dates, image_mode, area_string, additional_paths=[self.gif_path], framesPath = self.framesPath)}" download>
         <button class="p-Widget jupyter-widgets jupyter-button widget-button mod-warning">Download File</button>
         </a>
         </body>
@@ -467,7 +467,7 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
 
     
 def generate_zip(paths, title):
-    zip_path = os.path.dirname(__file__) + '/../../../'+title+'.zip'
+    zip_path = title+'.zip'
 
     with ZipFile(zip_path, 'w') as zipObj2:
         # Adds the pdf map, geotiffs and video to a zip file
