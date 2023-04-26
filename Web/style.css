@@ -1,0 +1,177 @@
+:root {
+  --background-color: #DCE3E7;
+  --middle-tone-color: #6C8FA1;
+  --highlight-color: #B5C9D1;
+  --button-color: #2E5A6F;
+}
+
+
+
+body {
+    width: 90vw;
+    float: center;
+	margin: auto;
+	padding: 0;
+	background-color: var(--bg-color);
+	color: #fff;
+	font-family: Arial, sans-serif;
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.map {
+	width: 100%;
+    height: 70vh;
+    margin: auto;
+    margin-top: 5vh;
+}
+
+
+.optionsNav{
+    display: none;
+    float: center;
+	margin: auto;
+    width: 100%;
+
+}
+.options:focus + optionsNav{
+    display: block;
+}
+
+
+
+.options.open {
+	height: 10vh;
+}
+
+button {
+    width: 100%;
+	display: block;
+	margin: 20px auto;
+	background-color: var(--button-color);
+	border: none;
+	border-radius: 5px;
+	color: #fff;
+	padding: 10px 20px;
+	cursor: pointer;
+}
+
+#next {
+    width: 100%;
+	display: block;
+	margin: 20px auto;
+	background-color: var(--button-color);
+	border: none;
+	border-radius: 5px;
+	color: #fff;
+	padding: 10px 20px;
+	cursor: pointer;
+}
+
+/* SETTINGS Overall layout */
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 2em;
+    border-radius: 5px;
+    margin-top:5vh;
+    background-color:var(--middle-tone-color);
+    color: #fff;
+    height: 100%;
+  }
+  
+  /* Central box */
+  .central-box {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    background-color: var(  --middle-tone-color);
+    margin-top: 2em;
+  }
+  
+  /* Left box */
+ .left-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width:50%;
+    background-color: var(  --middle-tone-color);
+    margin: 5vw, 0vh;
+  }
+  
+  /* Sub-boxes */
+ .box {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: center;
+    margin: 0.5em;
+    padding: 1em;
+    background-color: var(--highlight-color);
+    border-radius: 5px;
+    flex: 1;
+  }
+  
+  /* Date pickers */
+ .box .label {
+    display: block;
+    margin-bottom: 0.5em;
+  }
+  
+ .box .input[type="date"] {
+    width: 100%;
+    padding: 0.5em;
+    border-radius: 5px;
+    border: none;
+  }
+  
+  /* Radio buttons */
+ .box .radio-group {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1em;
+  }
+  
+ .box .radio-group .label {
+    margin-bottom: 0.5em;
+  }
+  
+ .box .radio-group input[type="radio"] {
+    margin-right: 0.5em;
+  }
+  
+
+
+
+  /* Right box */
+ .right-box {
+    width: 100%;
+    height: 100%;
+    margin-left: 2em;
+    padding: 0.5em;
+    border-radius: 5px;
+    background-color:var(--middle-tone-color)
+  }
+  
+
+  /* Next button */
+#next-button {
+    margin-top: 2em;
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    border: none;
+    background-color: #2980b9;
+    color: #fff;
+    cursor: pointer;
+  }
+  
+#next:hover {
+    background-color: #3498db;
+  }
+  
+
+  #indexNext{
+
+
+    visibility: hidden;
+  }

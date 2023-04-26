@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+    crossorigin=""/>
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+    crossorigin=""></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw-src.css" 
+    integrity="sha512-vJfMKRRm4c4UupyPwGUZI8U651mSzbmmPgR3sdE3LcwBPsdGeARvUM5EcSTg34DK8YIRiIo+oJwNfZPMKEQyug==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer" />
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"
+    integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw==" 
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <title>My Single Page App</title>
+    <style>
+      /* CSS to hide/show content */
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page active" id="index">
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>My Leaflet Map</title>
+        
+        </head>
+        <body>
+            <div class="map" id="IndMap"></div>
+               
+            <button id="draw-polygon-btn">Start Drawing</button>
+
+        </body>
+        </html>
+        
+      <button id="indexNext", onclick="showPage('settings')">Next</button>
+    </div>
+
+    <div class="page" id="settings">
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Settings</title>
+           
+        </head>
+        <body>
+        
+            <div class="container">
+                <form class="left-box">
+                    <div class="box">
+                        <label for="start-date">Start:</label>
+                        <input type="date" id="start-date" name="start-date">
+                        <label for="end-date">End:</label>
+                        <input type="date" id="end-date" name="end-date">
+                    </div>
+                    <div class="box">
+                        <label for="imagery-type">Imagery Type:</label>
+                        <input type="radio" id="true-color" name="imagery-type" value="true-color" checked>
+                        <label for="true-color">True Color</label><br>
+                        <input type="radio" id="burns" name="imagery-type" value="burns">
+                        <label for="burns">Burns</label><br>
+                        <input type="radio" id="vegetation" name="imagery-type" value="vegetation">
+                        <label for="vegetation">Vegetation</label>
+                    </div>
+                    <div class="box">
+                        <label for="aggregation-length">Aggregation Length:</label>
+                        <input type="radio" id="none" name="aggregation-length" value="none" checked>
+                        <label for="none">None</label><br>
+                        <input type="radio" id="monthly" name="aggregation-length" value="monthly">
+                        <label for="monthly">Monthly</label><br>
+                        <input type="radio" id="annual" name="aggregation-length" value="annual">
+                        <label for="annual">Annual</label>
+                    </div>
+                    <div class="box">
+                        <label for="aggregation-type">Aggregation Type:</label>
+                        <input type="radio" id="total-change" name="aggregation-type" value="total-change" checked>
+                        <label for="total-change">Total Change</label><br>
+                        <input type="radio" id="mean" name="aggregation-type" value="mean">
+                        <label for="mean">Mean</label><br>
+                        <input type="radio" id="median" name="aggregation-type" value="median">
+                        <label for="median">Median</label>
+                    </div>
+                </form>
+                <div class="right-box">
+                    <div class="map" id="settingsMap"></div>
+        
+                </div>
+               
+            </div>
+        
+            <button id="query-button" onclick="showPage('results')">Next</button>
+        </body>
+        </html>
+        
+
+    </div>
+    <div class="page" id="results">
+      <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Results</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="left-box">
+                <div class="box">
+                    <button>Save Image</button>
+                </div>
+                <div class="box">
+                    <button>Download Data</button>
+                </div>
+            </div>
+            <div class="right-box">
+                <div class="box">
+                <div class="map" id="resultsMap"></div>
+
+                </div>
+            </div>
+        
+        </div>
+
+    </body>
+    </html>
+
+      <button onclick="location.reload();">Start Over</button>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        
+        function showPage(pageId) {
+        $('.page').removeClass('active');
+        $('#' + pageId).addClass('active');
+        map.invalidateSize();
+        settingsMap.invalidateSize();
+        resultsMap.invalidateSize();
+        disableMapInteraction(settingsMap)
+        disableMapInteraction(resultsMap)
+
+        }
+        function getActivePageId() {
+        return $('.page.active').attr('id');
+        }
+
+        var activePageId = getActivePageId();
+        console.log(activePageId)
+      // JavaScript to show/hide content
+    </script>
+  </body>
+</html>
