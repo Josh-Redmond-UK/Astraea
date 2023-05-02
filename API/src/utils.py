@@ -18,6 +18,68 @@ from IPython.core.display import display
 import calendar
 import os.path
 
+
+def coordsToROI(coords):
+    roi = coolFunction
+    return roi
+
+def clipImgCol(imgCol, roi):
+    return imgCol.map(lambda x: x.clip(roi))
+
+def webGetCollection(roi, dateRange, maxCloud=100):
+    startDate, endDate = dateRange
+    areaOfInterest = roi
+
+    s2Collection = ee.ImageCollection("COPERNICUS/S2").filterDate(startDate, endDate).filterMetadata(
+    'CLOUDY_PIXEL_PERCENTAGE', 'less_than',maxCloud.value).filterBounds(areaOfInterest)
+    s2Clipped = clipImgCol(s2Collection)
+
+    cLon, cLat = areaOfInterest.centroid(200).getInfo()['coordinates']
+    areaName = reverse_geocode_area(cLon, cLat)
+    return s2Clipped, areaName
+
+def webAggregateCollection(collection, imageType, aggLength, aggType):
+
+    dates = ymdList(collection)
+
+    bands_order_dict = {"Burnt Area Index" : ['constant'],
+                        "Grey Green Blue Index":["red", "green", "blue"],
+                        "True Colour" : ['B4',  'B3', 'B2'],
+                        "NBR" : ['constant',"B3","B2"],
+                        "NDVI" : ["B4", 'constant', "B2"]}
+
+
+    aggregation_options_dict = {"Monthly": aggregate_monthly(collection, dates, aggType),
+                       "Annual": aggregate_anually(collection, dates, aggType),
+                       "None": (collection, dates)}
+
+    GeneratedCollection, dates = aggregation_options_dict[aggLength]
+
+
+
+    image_col_dict = {"Burnt Area Index": GeneratedCollection.map(get_BAIS2),
+                        "Grey Green Blue Index": GeneratedCollection.map(get_Green_Grey_Blue_Index),
+                      "True Colour": GeneratedCollection.map(lambda x: x.divide(10000)),
+                      "NBR": GeneratedCollection.map(add_NBR).map(reproject_to_calc_band),
+                      "NDVI": GeneratedCollection.map(add_NDVI).map(reproject_to_calc_band)}
+    
+    GeneratedCollection = image_col_dict[imageType]
+    selectedBands = bands_order_dict[imageType]
+
+    return GeneratedCollection, selectedBands
+
+def downloadImages(GeneratedCollection, selectedBands):
+    paths = get_imagecollection_download(GeneratedCollection.map(lambda x: x.select(selectedBands)))
+    return paths
+
+
+def webGeneratePaths(coordsList, dateRange, imageType, aggLength, aggType, maxCloud):
+    roi = coordsToROI(coordsList)
+    col = webGetCollection(roi, dateRange, maxCloud)
+    col, bands = webAggregateCollection(col, imageType, aggLength, aggType)
+    paths = downloadImages(col, bands)
+    return paths
+
 def clean_up_wd():
     tiffs = glob.glob("*.tif")
     gifs = glob.glob("*.gif")
@@ -397,7 +459,7 @@ def get_imagecollection_download(img_col):
             test_r.raw.decode_content = True
             shutil.copyfileobj(test_r.raw, f)
         downloaded_images.append(path)
-
+    return downloaded_images
 
 
 def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, area_string, framesPath):
