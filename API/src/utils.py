@@ -48,7 +48,7 @@ def webAggregateCollection(collection, imageType, aggLength, aggType):
 
     bands_order_dict = {"Burnt Area Index" : ['constant'],
                         "Grey Green Blue Index":["red", "green", "blue"],
-                        "True Colour" : ['B4',  'B3', 'B2'],
+                        "TrueColour" : ['B4',  'B3', 'B2'],
                         "NBR" : ['constant',"B3","B2"],
                         "NDVI" : ["B4", 'constant', "B2"]}
 
@@ -63,7 +63,7 @@ def webAggregateCollection(collection, imageType, aggLength, aggType):
 
     image_col_dict = {"Burnt Area Index": GeneratedCollection.map(get_BAIS2),
                         "Grey Green Blue Index": GeneratedCollection.map(get_Green_Grey_Blue_Index),
-                      "True Colour": GeneratedCollection.map(lambda x: x.divide(10000)),
+                      "TrueColour": GeneratedCollection.map(lambda x: x.divide(10000)),
                       "NBR": GeneratedCollection.map(add_NBR).map(reproject_to_calc_band),
                       "NDVI": GeneratedCollection.map(add_NDVI).map(reproject_to_calc_band)}
     
