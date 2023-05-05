@@ -20,7 +20,11 @@ import os.path
 
 
 def coordsToROI(coords):
-    roi = coolFunction
+    stringList = coords.split(',')
+    coordsNum = [float(x) for x in stringList]
+    it = iter(coordsNum)
+    coords = [*zip(it, it)]
+    roi = ee.Geometry.Polygon(coords)
     return roi
 
 def clipImgCol(imgCol, roi):
@@ -31,8 +35,8 @@ def webGetCollection(roi, dateRange, maxCloud=100):
     areaOfInterest = roi
 
     s2Collection = ee.ImageCollection("COPERNICUS/S2").filterDate(startDate, endDate).filterMetadata(
-    'CLOUDY_PIXEL_PERCENTAGE', 'less_than',maxCloud.value).filterBounds(areaOfInterest)
-    s2Clipped = clipImgCol(s2Collection)
+    'CLOUDY_PIXEL_PERCENTAGE', 'less_than',maxCloud).filterBounds(areaOfInterest)
+    s2Clipped = clipImgCol(s2Collection, roi)
 
     cLon, cLat = areaOfInterest.centroid(200).getInfo()['coordinates']
     areaName = reverse_geocode_area(cLon, cLat)
@@ -66,7 +70,7 @@ def webAggregateCollection(collection, imageType, aggLength, aggType):
     GeneratedCollection = image_col_dict[imageType]
     selectedBands = bands_order_dict[imageType]
 
-    return GeneratedCollection, selectedBands
+    return GeneratedCollection, selectedBands, dates
 
 def downloadImages(GeneratedCollection, selectedBands):
     paths = get_imagecollection_download(GeneratedCollection.map(lambda x: x.select(selectedBands)))
@@ -75,10 +79,10 @@ def downloadImages(GeneratedCollection, selectedBands):
 
 def webGeneratePaths(coordsList, dateRange, imageType, aggLength, aggType, maxCloud):
     roi = coordsToROI(coordsList)
-    col = webGetCollection(roi, dateRange, maxCloud)
-    col, bands = webAggregateCollection(col, imageType, aggLength, aggType)
+    col, name = webGetCollection(roi, dateRange, maxCloud)
+    col, bands, dates = webAggregateCollection(col, imageType, aggLength, aggType)
     paths = downloadImages(col, bands)
-    return paths
+    return name, dates, paths, col
 
 def clean_up_wd():
     tiffs = glob.glob("*.tif")

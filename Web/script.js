@@ -140,7 +140,7 @@ function makeApiQuery() {
     const aggregationType = aggregationTypeInput.value;
     
     // Format the input values as a string for the API query
-    const apiQueryString = `start-date=${startDate}&end-date=${endDate}&imagery-type=${imageryType}&aggregation-length=${aggregationLength}&aggregation-type=${aggregationType}`;
+    const apiQueryString = `coords=${PolygonString}&start-date=${startDate}&end-date=${endDate}&imagery-type=${imageryType}&aggregation-length=${aggregationLength}&aggregation-type=${aggregationType}`;
     console.log(apiQueryString)
     /// Make query
     // Go to loading screen
@@ -150,10 +150,22 @@ function makeApiQuery() {
 
 }
 
+document.getElementById('query-button').addEventListener('click', makeApiQuery)
+
 document.getElementById('draw-polygon-btn').addEventListener('click', function() {
   polylineDrawHandler = new L.Draw.Polygon(map, drawControl.options.polygon);
   polylineDrawHandler.enable();
 });
+
+document.getElementById('indexNext').addEventListener('click', function() {
+  bounds = map.getCenter()
+  zoom = map.getZoom()
+
+
+  settingsMap.setView(bounds, zoom)
+  resultsMap.setView(bounds, zoom)
+
+})
 
 
 //document.getElementById("query-button").addEventListener("click",makeApiQuery)
