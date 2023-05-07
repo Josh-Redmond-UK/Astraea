@@ -24,7 +24,7 @@ def coordsToROI(coords):
     coordsNum = [float(x) for x in stringList]
     it = iter(coordsNum)
     coords = [*zip(it, it)]
-    roi = ee.Geometry.Polygon(coords)
+    roi = ee.Geometry.Polygon(coords).bounds()
     return roi
 
 def clipImgCol(imgCol, roi):
@@ -36,15 +36,16 @@ def webGetCollection(roi, dateRange, maxCloud=100):
 
     s2Collection = ee.ImageCollection("COPERNICUS/S2").filterDate(startDate, endDate).filterMetadata(
     'CLOUDY_PIXEL_PERCENTAGE', 'less_than',maxCloud).filterBounds(areaOfInterest)
+    dates = ymdList(s2Collection)
+
     s2Clipped = clipImgCol(s2Collection, roi)
 
     cLon, cLat = areaOfInterest.centroid(200).getInfo()['coordinates']
     areaName = reverse_geocode_area(cLon, cLat)
-    return s2Clipped, areaName
+    return s2Clipped, areaName, dates
 
-def webAggregateCollection(collection, imageType, aggLength, aggType):
+def webAggregateCollection(collection, imageType, aggLength, aggType, dates):
 
-    dates = ymdList(collection)
 
     bands_order_dict = {"Burnt Area Index" : ['constant'],
                         "Grey Green Blue Index":["red", "green", "blue"],
@@ -72,16 +73,16 @@ def webAggregateCollection(collection, imageType, aggLength, aggType):
 
     return GeneratedCollection, selectedBands, dates
 
-def downloadImages(GeneratedCollection, selectedBands):
-    paths = get_imagecollection_download(GeneratedCollection.map(lambda x: x.select(selectedBands)))
+def downloadImages(GeneratedCollection, selectedBands, roi):
+    paths = get_imagecollection_download(GeneratedCollection.map(lambda x: x.select(selectedBands)), roi)
     return paths
 
 
 def webGeneratePaths(coordsList, dateRange, imageType, aggLength, aggType, maxCloud):
     roi = coordsToROI(coordsList)
-    col, name = webGetCollection(roi, dateRange, maxCloud)
-    col, bands, dates = webAggregateCollection(col, imageType, aggLength, aggType)
-    paths = downloadImages(col, bands)
+    col, name, dates = webGetCollection(roi, dateRange, maxCloud)
+    col, bands, dates = webAggregateCollection(col, imageType, aggLength, aggType, dates)
+    paths = downloadImages(col, bands, roi)
     return name, dates, paths, col
 
 def clean_up_wd():
@@ -318,6 +319,9 @@ def generate_and_serve_zip_payload(images_list, bounds_tuple, bands, title, date
 
     return payload
 
+#def getImageScale(roi, gifSize=1440):
+
+
 
 def convert_image_resolution(image, gif_size=1280):
     # converts image from one resolution to another according to a target size - so it can be sent to a gif easily
@@ -376,7 +380,7 @@ def aggregate_monthly(img_col, datelist, mode="Mean"):
         try:
             monthly_dict = {"Mean":img_col.filterDate(m[0], m[1]).mean().setDefaultProjection("EPSG:3857", scale=10),
                         "Median":img_col.filterDate(m[0], m[1]).median().setDefaultProjection("EPSG:3857", scale=10), 
-                        "Max":img_col.filterDate(m[0], m[1]).qualityMosaic("constant").setDefaultProjection("EPSG:3857", scale=10)}
+                        "Max":img_col.filterDate(m[0], m[1]).max().setDefaultProjection("EPSG:3857", scale=10)}
         
         except:
             monthly_dict = {"Mean":img_col.filterDate(m[0], m[1]).mean().setDefaultProjection("EPSG:3857", scale=10),
@@ -425,7 +429,7 @@ def aggregate_anually(img_col, datelist, mode="Mean"):
         try:
             annual_dict = {"Mean":img_col.filterDate(y[0], y[1]).mean().setDefaultProjection("EPSG:3857", scale=10),
                             "Median":img_col.filterDate(y[0],y[1]).median().setDefaultProjection("EPSG:3857", scale=10), 
-                            "Max":img_col.filterDate(y[0], y[1]).qualityMosaic("constant").setDefaultProjection("EPSG:3857", scale=10)}
+                            "Max":img_col.filterDate(y[0], y[1]).max().setDefaultProjection("EPSG:3857", scale=10)}
         except:
             annual_dict = {"Mean":img_col.filterDate(y[0], y[1]).mean().setDefaultProjection("EPSG:3857", scale=10),
                 "Median":img_col.filterDate(y[0],y[1]).median().setDefaultProjection("EPSG:3857", scale=10), 
@@ -442,28 +446,7 @@ def aggregate_anually(img_col, datelist, mode="Mean"):
                         
                         
     
-def get_imagecollection_download(img_col):
-    num_images = img_col.size().getInfo()
-
-    images_list = img_col.toList(num_images)
-
-    downloaded_images = []
-    for idx, img in enumerate(images_list):
-    #reproject("EPSG:3857")
-        test_url = img.getDownloadURL(params={
-            "format" : "GEO_TIFF"})
-
-        test_r = requests.get(test_url, stream=True)
-        print(test_url)
-        #print(test_url)
-        #print(test_r)v os.path.dirname(__file__) + f'/../../../'
-        path = os.path.dirname(__file__) + '/../../../'+'frame'+str(idx)+'.tif'
-        assert test_r.status_code == 200
-        with open(path, 'wb') as f:
-            test_r.raw.decode_content = True
-            shutil.copyfileobj(test_r.raw, f)
-        downloaded_images.append(path)
-    return downloaded_images
+#
 
 
 def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, area_string, framesPath):
@@ -542,7 +525,7 @@ def generate_zip(paths, title):
 
     return zip_path
 
-def get_imagecollection_download(img_col):
+def get_imagecollection_download(img_col, roi):
     num_images = img_col.size().getInfo()
 
     ee_images_list = img_col.toList(num_images)
@@ -552,15 +535,17 @@ def get_imagecollection_download(img_col):
         images_list.append(ee.Image(ee_images_list.get(i)))
 
     downloaded_images = []
-    progressBar = widgets.IntProgress(value = 0, min = 0, max = len(images_list))
+    #progressBar = widgets.IntProgress(value = 0, min = 0, max = len(images_list))
     for idx, img in enumerate(images_list):
     #reproject("EPSG:3857")
-        scale = convert_image_resolution(img, 1440).nominalScale()
+        #img = ee.Image.constant(0).clip(roi).add(img)
+        #scale = convert_image_resolution(img, 1440).nominalScale()
     
     
         test_url = img.getDownloadURL(params={
             "format" : "GEO_TIFF",
-            "scale": scale})
+            "scale": 10,
+            "region":roi})
         #print(test_url)
         test_r = requests.get(test_url, stream=True)
         #print(test_url)
@@ -568,21 +553,25 @@ def get_imagecollection_download(img_col):
         path = os.path.dirname(__file__) + f'/../../../{idx}.tif'
 
         #path = './frame'+str(idx)+'.tif'
-        print( test_r.status_code)
+        #print( test_r.status_code)
         assert test_r.status_code == 200
         with open(path, 'wb') as f:
             test_r.raw.decode_content = True
             shutil.copyfileobj(test_r.raw, f)
         downloaded_images.append(path)
-        progressBar.value += 1 
-    del(progressBar)
+        #progressBar.value += 1 
+
     return downloaded_images
 
 def create_gif(frame_paths, title, fps=1):
     images = [imageio.imread(path) for path in frame_paths]
+    for i in images:
+        print(i.shape)
+
     images = [np.clip(i/np.max(i)*255, 0, 255).astype(np.uint8) for i in images]
     gif_title = os.path.dirname(__file__) + f'/../../../{title}.gif'
-    imageio.mimsave(gif_title, images, fps=1)
+    imageio.mimsave(gif_title, images, duration=1000)
+    return gif_title
     
 def download_gif(img_col, title="Animation", fps=1):
     frame_paths = get_imagecollection_download(img_col)

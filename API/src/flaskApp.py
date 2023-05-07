@@ -32,8 +32,9 @@ def generatePaths():
     
 
     name, dates, paths, col = webGeneratePaths(coords, (ee.Date(str(startDate)), ee.Date(str(endDate))), imageType, aggregationLength, aggregationType, 100)
+    gifPath = create_gif(paths, name)
     currentData = (name, dates, paths, col)
-    return jsonify(name=name, dates=dates, imagePaths=paths)
+    return jsonify(name=name, dates=dates, gifUrl=gifPath)
 
 
 @app.route('/api/mapping/download', methods=['GET'])
