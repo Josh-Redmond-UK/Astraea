@@ -1,8 +1,10 @@
 from utils import *
 from flask import Flask
 from flask import request, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 ee.Initialize()
 
@@ -34,7 +36,23 @@ def generatePaths():
     name, dates, paths, col = webGeneratePaths(coords, (ee.Date(str(startDate)), ee.Date(str(endDate))), imageType, aggregationLength, aggregationType, 100)
     gifPath = create_gif(paths, name)
     currentData = (name, dates, paths, col)
-    return jsonify(name=name, dates=dates, gifUrl=gifPath)
+    roi = coordsToROI(coords)
+    boundsGeom = roi.getInfo()['coordinates']
+
+    coordFrame = pd.DataFrame(boundsGeom[0], columns=["Lat", 'Lon'])
+    s = min(coordFrame['Lat'])
+    n = max(coordFrame['Lat'])
+    w = min(coordFrame['Lon'])
+    e = max(coordFrame['Lon'])
+
+    sw = (s,w)
+    ne = (n,e)
+
+    response = jsonify(name=name, dates=dates, gifUrl=gifPath, sw=sw, ne=ne)
+
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response
 
 
 @app.route('/api/mapping/download', methods=['GET'])

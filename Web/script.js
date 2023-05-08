@@ -124,7 +124,7 @@ map.on('draw:drawstart ', function (e) {
 
 
 
-function makeApiQuery() {
+async function makeApiQuery() {
     // Get references to the form inputs
     const startDateInput = document.querySelector('#start-date');
     const endDateInput = document.querySelector('#end-date');
@@ -138,11 +138,40 @@ function makeApiQuery() {
     const imageryType = imageryTypeInput.value;
     const aggregationLength = aggregationLengthInput.value;
     const aggregationType = aggregationTypeInput.value;
+
+    var londonBounds = L.latLngBounds(L.latLng(51.507222, -0.127758), L.latLng(51.515419, -0.109863));
+
+    // Create an image overlay with the URL of the image and the bounds of the spatial extent
+    var imageOverlay = L.imageOverlay('https://picsum.photos/200', londonBounds);
+  
+    // Add the image overlay to the resultsMap
+    imageOverlay.addTo(resultsMap);
+  
     
     // Format the input values as a string for the API query
-    const apiQueryString = `coords=${PolygonString}&start-date=${startDate}&end-date=${endDate}&imagery-type=${imageryType}&aggregation-length=${aggregationLength}&aggregation-type=${aggregationType}`;
+    const apiQueryString = `http://127.0.0.1:5000/api/mapping?coords=${PolygonString}&start-date=${startDate}&end-date=${endDate}&imagery-type=${imageryType}&aggregation-length=${aggregationLength}&aggregation-type=${aggregationType}`;
     console.log(apiQueryString)
     /// Make query
+    var response = await fetch(apiQueryString);
+    var data = await response.json();
+    console.log(response);
+    console.log(data);
+    var gifUrl = data.gifUrl;
+
+    // Get the latitude and longitude of the GIF from the response data
+    const ne = data.ne;
+    const sw = data.sw;
+
+    var latLngBounds = L.latLngBounds(sw, ne)
+
+    var imageOverlay = L.imageOverlay('/Users/joshredmond/Downloads/EcoregionClassBalance.png', latLngBounds)
+
+    imageOverlay.addTo(resultsMap)
+
+    // Define the spatial extent of central London
+
+  
+
     // Go to loading screen
     // Wait for results
     // Add results to html and show

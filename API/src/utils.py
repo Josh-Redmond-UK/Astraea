@@ -18,6 +18,16 @@ from IPython.core.display import display
 import calendar
 import os.path
 
+def getBoundsCoords(Lats, Lons):
+    s = min(Lats)
+    n = max(Lats)
+    w = min(Lons)
+    e = max(Lons)
+
+    sw = (s,w)
+    ne = (n,e)
+
+    return sw, ne
 
 def coordsToROI(coords):
     stringList = coords.split(',')
