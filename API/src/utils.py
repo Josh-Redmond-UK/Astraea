@@ -18,16 +18,7 @@ from IPython.core.display import display
 import calendar
 import os.path
 
-def getBoundsCoords(Lats, Lons):
-    s = min(Lats)
-    n = max(Lats)
-    w = min(Lons)
-    e = max(Lons)
 
-    sw = (s,w)
-    ne = (n,e)
-
-    return sw, ne
 
 def coordsToROI(coords):
     stringList = coords.split(',')
@@ -579,7 +570,7 @@ def create_gif(frame_paths, title, fps=1):
         print(i.shape)
 
     images = [np.clip(i/np.max(i)*255, 0, 255).astype(np.uint8) for i in images]
-    gif_title = os.path.dirname(__file__) + f'/../../../{title}.gif'
+    gif_title = f'/Users/joshredmond/Documents/GitHub/Astraea/{title}.gif'
     imageio.mimsave(gif_title, images, duration=1000)
     return gif_title
     

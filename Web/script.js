@@ -139,13 +139,8 @@ async function makeApiQuery() {
     const aggregationLength = aggregationLengthInput.value;
     const aggregationType = aggregationTypeInput.value;
 
-    var londonBounds = L.latLngBounds(L.latLng(51.507222, -0.127758), L.latLng(51.515419, -0.109863));
-
-    // Create an image overlay with the URL of the image and the bounds of the spatial extent
-    var imageOverlay = L.imageOverlay('https://picsum.photos/200', londonBounds);
+    //var londonBounds = L.latLngBounds(L.latLng(51.507222, -0.127758), L.latLng(51.515419, -0.109863));
   
-    // Add the image overlay to the resultsMap
-    imageOverlay.addTo(resultsMap);
   
     
     // Format the input values as a string for the API query
@@ -159,12 +154,19 @@ async function makeApiQuery() {
     var gifUrl = data.gifUrl;
 
     // Get the latitude and longitude of the GIF from the response data
-    const ne = data.ne;
-    const sw = data.sw;
+    const n =  data.n;
+    const e = data.e;
+    const s = data.s;
+    const w = data.w;
 
-    var latLngBounds = L.latLngBounds(sw, ne)
+    var latLngBounds = drawnItemsResults.getBounds()// L.latLngBounds(L.latLng(s, w), L.latLng(n, e))
+    // Create an image overlay with the URL of the image and the bounds of the spatial extent
+    var imageOverlay = L.imageOverlay(gifUrl, latLngBounds);
+  
+    // Add the image overlay to the resultsMap
+    imageOverlay.addTo(resultsMap);
 
-    var imageOverlay = L.imageOverlay('/Users/joshredmond/Downloads/EcoregionClassBalance.png', latLngBounds)
+    //var imageOverlay = L.imageOverlay('/Users/joshredmond/Downloads/EcoregionClassBalance.png', londonBounds)
 
     imageOverlay.addTo(resultsMap)
 
