@@ -31,6 +31,14 @@ def coordsToROI(coords):
 def clipImgCol(imgCol, roi):
     return imgCol.map(lambda x: x.clip(roi))
 
+def webGetZipPayload(images_list, roi, bands, title, dates, image_mode, area_string, framesPath):
+    
+    #paths = generate_maps(images_list, roi, bands, title, dates, image_mode, area_string, framesPath)
+    zip_path = generate_zip(framesPath, title)
+    return zip_path
+
+
+
 def webGetCollection(roi, dateRange, maxCloud=100):
     startDate, endDate = dateRange
     areaOfInterest = roi
@@ -84,7 +92,8 @@ def webGeneratePaths(coordsList, dateRange, imageType, aggLength, aggType, maxCl
     col, name, dates = webGetCollection(roi, dateRange, maxCloud)
     col, bands, dates = webAggregateCollection(col, imageType, aggLength, aggType, dates)
     paths = downloadImages(col, bands, roi)
-    return name, dates, paths, col
+    zipPath = webGetZipPayload(None, roi, None, name, dates, imageType, name, paths)
+    return name, dates, paths, col, zipPath
 
 def clean_up_wd():
     tiffs = glob.glob("*.tif")
@@ -450,8 +459,13 @@ def aggregate_anually(img_col, datelist, mode="Mean"):
 #
 
 
-def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, area_string, framesPath):
-    min_lon, max_lon, min_lat, max_lat = bounds_tuple
+def generate_maps(images_list, roi, bands, title, dates, image_mode, area_string, framesPath):
+    bounds_frame = pd.DataFrame(np.array(roi.bounds().getInfo()['coordinates'][0]), columns=["Lon", "Lat"])
+    min_lon = bounds_frame['Lon'].min()
+    max_lon = bounds_frame['Lon'].max()
+    min_lat = bounds_frame['Lat'].min()
+    max_lat = bounds_frame['Lat'].max()
+
     #print(framesPath)
     downloaded_images = []
     arrays = []
@@ -466,9 +480,9 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
 
 
     nrows = len(arrays)
-    fig, axes = plt.subplots(figsize=(16.5, 11.75*nrows), nrows=nrows)
+    fig, axes = plt.subplots(figsize=(16.5, 11.75*nrows), nrows=nrows, squeeze=True)
 
-    axes = axes.flatten()
+    #axes = axes.flatten()
     for idx, ar in enumerate(arrays):
 
         img_extent = (min_lon, max_lon, min_lat, max_lat)
@@ -488,9 +502,9 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
         axes[idx].title.set_text(title)
     
     nrows = len(arrays)
-    fig, axes = plt.subplots(figsize=(16.5, 11.75*nrows), nrows=nrows)
+    fig, axes = plt.subplots(figsize=(16.5, 11.75*nrows), nrows=nrows, squeeze=True)
 
-    axes = axes.flatten()
+    #axes = axes.flatten()
     for idx, ar in enumerate(arrays):
 
         img_extent = (min_lon, max_lon, min_lat, max_lat)
@@ -517,7 +531,7 @@ def generate_maps(images_list, bounds_tuple, bands, title, dates, image_mode, ar
 
     
 def generate_zip(paths, title):
-    zip_path = title+'.zip'
+    zip_path = os.path.join(os.path.dirname(__file__) ,  title+'.zip')
 
     with ZipFile(zip_path, 'w') as zipObj2:
         # Adds the pdf map, geotiffs and video to a zip file
@@ -578,3 +592,5 @@ def download_gif(img_col, title="Animation", fps=1):
     frame_paths = get_imagecollection_download(img_col)
     create_gif(frame_paths, title, fps)
     return frame_paths
+
+

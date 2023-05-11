@@ -109,12 +109,22 @@
                
             </div>
         
-            <button id="query-button" onclick="showPage('results')">Next</button>
+            <button id="query-button" onclick="showPage('loading')">Next</button>
         </body>
         </html>
         
 
     </div>
+
+    <div class="page" id="loading">
+      <div class="loader"></div>
+      <div class="loader-text">Please wait...</div>
+
+    
+    
+    </div>
+
+
     <div class="page" id="results">
       <!DOCTYPE html>
     <html>
@@ -128,7 +138,7 @@
                     <button>Save Image</button>
                 </div>
                 <div class="box">
-                    <button>Download Data</button>
+                    <button id="downloadZipButton">Download Data</button>
                 </div>
             </div>
             <div class="right-box">
@@ -148,16 +158,7 @@
     <script src="script.js"></script>
     <script>
         
-        function showPage(pageId) {
-        $('.page').removeClass('active');
-        $('#' + pageId).addClass('active');
-        map.invalidateSize();
-        settingsMap.invalidateSize();
-        resultsMap.invalidateSize();
-        disableMapInteraction(settingsMap)
-        disableMapInteraction(resultsMap)
 
-        }
         function getActivePageId() {
         return $('.page.active').attr('id');
         }

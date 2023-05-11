@@ -148,10 +148,19 @@ async function makeApiQuery() {
     console.log(apiQueryString)
     /// Make query
     var response = await fetch(apiQueryString);
+
+    if (response.ok) {
+
+
     var data = await response.json();
+
+
+
     console.log(response);
     console.log(data);
     var gifUrl = data.gifUrl;
+    var zipUrl = data.zipUrl;
+
 
     // Get the latitude and longitude of the GIF from the response data
     const n =  data.n;
@@ -166,13 +175,21 @@ async function makeApiQuery() {
     // Add the image overlay to the resultsMap
     imageOverlay.addTo(resultsMap);
 
-    //var imageOverlay = L.imageOverlay('/Users/joshredmond/Downloads/EcoregionClassBalance.png', londonBounds)
+  //  var downloadButton = document.getElementById('downloadZipButton')
+ //   const onclicktext = 'window.location.href${test}';
+ //#   downloadButton.onclick = 
 
-    imageOverlay.addTo(resultsMap)
+    showPage('results')
+    }
+    else{
+      const loaderText = document.querySelector('.loader-text');
+      loaderText.textContent = 'Error, please try again';
+      setTimeout(location.reload(), 2000);
 
-    // Define the spatial extent of central London
 
-  
+
+    }
+
 
     // Go to loading screen
     // Wait for results
@@ -198,6 +215,15 @@ document.getElementById('indexNext').addEventListener('click', function() {
 
 })
 
+function showPage(pageId) {
+  $('.page').removeClass('active');
+  $('#' + pageId).addClass('active');
+  map.invalidateSize();
+  settingsMap.invalidateSize();
+  resultsMap.invalidateSize();
+  disableMapInteraction(settingsMap)
+  disableMapInteraction(resultsMap)
 
+  }
 //document.getElementById("query-button").addEventListener("click",makeApiQuery)
 
