@@ -175,15 +175,24 @@ async function makeApiQuery() {
     // Add the image overlay to the resultsMap
     imageOverlay.addTo(resultsMap);
 
-  //  var downloadButton = document.getElementById('downloadZipButton')
- //   const onclicktext = 'window.location.href${test}';
- //#   downloadButton.onclick = 
+    var downloadButton = document.getElementById('downloadZipButton')
+    var gifButton = document.getElementById('downloadGifButton')
+
+    const onclicktext = 'window.location.href${test}';
+    console.log(zipUrl)
+    downloadButton.onclick = function() {
+      window.open(zipUrl);
+    };
+    gifButton.onclick = function() {
+      window.open(gifUrl);
+    };
+
 
     showPage('results')
     }
     else{
       const loaderText = document.querySelector('.loader-text');
-      loaderText.textContent = 'Error, please try again';
+      loaderText.textContent = 'Error, por favor intentalo de nuevo';
       setTimeout(location.reload(), 2000);
 
 

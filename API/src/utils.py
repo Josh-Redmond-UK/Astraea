@@ -31,10 +31,12 @@ def coordsToROI(coords):
 def clipImgCol(imgCol, roi):
     return imgCol.map(lambda x: x.clip(roi))
 
-def webGetZipPayload(images_list, roi, bands, title, dates, image_mode, area_string, framesPath):
-    
+def webGetZipPayload(images_list, roi, bands, title, dates, image_mode, area_string, framesPath, gifPath=None):
+    paths = framesPath
+    gifPath = create_gif(framesPath, title)
+    paths.append(gifPath)
     #paths = generate_maps(images_list, roi, bands, title, dates, image_mode, area_string, framesPath)
-    zip_path = generate_zip(framesPath, title)
+    zip_path = generate_zip(paths, title)
     return zip_path
 
 
@@ -531,7 +533,7 @@ def generate_maps(images_list, roi, bands, title, dates, image_mode, area_string
 
     
 def generate_zip(paths, title):
-    zip_path = os.path.join(os.path.dirname(__file__) ,  title+'.zip')
+    zip_path = os.path.join(os.path.dirname(__file__) ,  'results'+'.zip')
 
     with ZipFile(zip_path, 'w') as zipObj2:
         # Adds the pdf map, geotiffs and video to a zip file

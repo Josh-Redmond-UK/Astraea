@@ -48,7 +48,7 @@ def generatePaths():
     sw = (s,w)
     ne = (n,e)
 
-    response = jsonify(name=name, dates=dates, s=s, e=e, w=w, n=n, gifUrl=gifPath, zipPath=zipPath)
+    response = jsonify(name=name, dates=dates, s=s, e=e, w=w, n=n, gifUrl=gifPath, zipUrl=zipPath)
 
     response.headers.add('Access-Control-Allow-Origin', '*')
 

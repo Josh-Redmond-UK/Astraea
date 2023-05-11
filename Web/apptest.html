@@ -43,18 +43,18 @@
         <!DOCTYPE html>
         <html>
         <head>
-            <title>My Leaflet Map</title>
+            <title>Astraea</title>
         
         </head>
         <body>
             <div class="map" id="IndMap"></div>
                
-            <button id="draw-polygon-btn">Start Drawing</button>
+            <button id="draw-polygon-btn">Dibujar un Poligono</button>
 
         </body>
         </html>
         
-      <button id="indexNext", onclick="showPage('settings')">Next</button>
+      <button id="indexNext", onclick="showPage('settings')">Siguiente</button>
     </div>
 
     <div class="page" id="settings">
@@ -69,37 +69,37 @@
             <div class="container">
                 <form class="left-box">
                     <div class="box">
-                        <label for="start-date">Start:</label>
+                        <label for="start-date">Fecha de Inicio</label>
                         <input type="date" id="start-date" name="start-date">
-                        <label for="end-date">End:</label>
+                        <label for="end-date">Fecha de termino</label>
                         <input type="date" id="end-date" name="end-date">
                     </div>
                     <div class="box">
-                        <label for="imagery-type">Imagery Type:</label>
+                        <label for="imagery-type">Tipo de Imagen:</label>
                         <input type="radio" id="TrueColour" name="imagery-type" value="TrueColour" checked>
-                        <label for="TrueColour">True Color</label><br>
+                        <label for="TrueColour">Colores Verdaderos</label><br>
                         <input type="radio" id="burns" name="imagery-type" value="NBR">
-                        <label for="burns">Burns</label><br>
+                        <label for="burns">Quemaduras</label><br>
                         <input type="radio" id="vegetation" name="imagery-type" value="NDVI">
-                        <label for="vegetation">Vegetation</label>
+                        <label for="vegetation">Vegetacion</label>
                     </div>
                     <div class="box">
-                        <label for="aggregation-length">Aggregation Length:</label>
+                        <label for="aggregation-length">Duracion de Agregacion:</label>
                         <input type="radio" id="none" name="aggregation-length" value="None" checked>
-                        <label for="none">None</label><br>
+                        <label for="none">Ninguno</label><br>
                         <input type="radio" id="monthly" name="aggregation-length" value="Monthly">
-                        <label for="monthly">Monthly</label><br>
+                        <label for="monthly">Mensual</label><br>
                         <input type="radio" id="annual" name="aggregation-length" value="Annual">
-                        <label for="annual">Annual</label>
+                        <label for="annual">Anual</label>
                     </div>
                     <div class="box">
-                        <label for="aggregation-type">Aggregation Type:</label>
+                        <label for="aggregation-type">Tipo de Agregacion:</label>
                         <input type="radio" id="Max" name="aggregation-type" value="Max" checked>
-                        <label for="Max">Total Change</label><br>
+                        <label for="Max">Max</label><br>
                         <input type="radio" id="Mean" name="aggregation-type" value="Mean">
-                        <label for="Mean">Mean</label><br>
+                        <label for="Mean">Media</label><br>
                         <input type="radio" id="Median" name="aggregation-type" value="Median">
-                        <label for="Median">Median</label>
+                        <label for="Median">Número Medio</label>
                     </div>
                 </form>
                 <div class="right-box">
@@ -109,7 +109,7 @@
                
             </div>
         
-            <button id="query-button" onclick="showPage('loading')">Next</button>
+            <button id="query-button" onclick="showPage('loading')">Siguiente</button>
         </body>
         </html>
         
@@ -118,7 +118,7 @@
 
     <div class="page" id="loading">
       <div class="loader"></div>
-      <div class="loader-text">Please wait...</div>
+      <div class="loader-text">Por favor espere...</div>
 
     
     
@@ -135,10 +135,10 @@
         <div class="container">
             <div class="left-box">
                 <div class="box">
-                    <button>Save Image</button>
+                    <button id="downloadGifButton">Guardar Imagen</button>
                 </div>
                 <div class="box">
-                    <button id="downloadZipButton">Download Data</button>
+                    <button id="downloadZipButton">Descargar Datos</button>
                 </div>
             </div>
             <div class="right-box">
@@ -153,7 +153,7 @@
     </body>
     </html>
 
-      <button onclick="location.reload();">Start Over</button>
+      <button onclick="location.reload();">Reiniciar</button>
     </div>
     <script src="script.js"></script>
     <script>

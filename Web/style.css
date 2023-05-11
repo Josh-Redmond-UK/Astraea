@@ -154,9 +154,11 @@ button, #next {
 
 .loader-text {
   font-size: 18px;
+  margin: auto;
+  width: 50%;
   font-weight: bold;
   text-align: center;
-  margin-top: 20px;
+
 }
 
 @keyframes spin {
