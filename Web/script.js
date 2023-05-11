@@ -37,10 +37,10 @@ return osmTiles
 
 
 
-var map = L.map('IndMap').setView([51.505, -0.09], 13);
+var map = L.map('IndMap').setView([23.6345, -102.5528], 5);
 
-var settingsMap = L.map('settingsMap').setView([51.505, -0.09], 13);
-var resultsMap = L.map('resultsMap').setView([51.505, -0.09], 13);
+var settingsMap = L.map('settingsMap').setView([23.6345, -102.5528], 5);
+var resultsMap = L.map('resultsMap').setView([23.6345, -102.5528], 5);
 
 var indBase = getGoogleSatelliteTiles().addTo(map)
 var settingsBase = getGoogleSatelliteTiles().addTo(settingsMap)
@@ -54,7 +54,7 @@ var drawnItemsResults = new L.FeatureGroup();
 
 map.addLayer(drawnItems);
 settingsMap.addLayer(drawnItemsSettings);
-resultsMap.addLayer(drawnItemsResults);
+//resultsMap.addLayer(drawnItemsResults);
 
 
 var PolygonString = ''

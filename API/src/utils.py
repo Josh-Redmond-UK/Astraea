@@ -587,7 +587,7 @@ def create_gif(frame_paths, title, fps=1):
 
     images = [np.clip(i/np.max(i)*255, 0, 255).astype(np.uint8) for i in images]
     gif_title = f'/Users/joshredmond/Documents/GitHub/Astraea/{title}.gif'
-    imageio.mimsave(gif_title, images, duration=1000)
+    imageio.mimsave(gif_title, images, duration=1000, loop=1000)
     return gif_title
     
 def download_gif(img_col, title="Animation", fps=1):
