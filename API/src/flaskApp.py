@@ -36,7 +36,7 @@ def generatePaths():
     name, dates, paths, col = webGeneratePaths(coords, (ee.Date(str(startDate)), ee.Date(str(endDate))), imageType, aggregationLength, aggregationType, 100)
     gifPath = create_gif(paths, name)
     currentData = (name, dates, paths, col)
-    roi = coordsToROI(coords)
+    roi = coordsToROI(coords).bounds(10)
     boundsGeom = roi.getInfo()['coordinates']
 
     coordFrame = pd.DataFrame(boundsGeom[0], columns=["Lat", 'Lon'])
