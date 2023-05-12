@@ -122,6 +122,110 @@ map.on('draw:drawstart ', function (e) {
 })
 
 
+var searchButton = document.getElementById('search-button');
+
+// Attach an event listener to the search button
+searchButton.addEventListener('click', function() {
+  var searchInput = document.getElementById('search-input').value;
+  searchLocation(searchInput);
+});
+
+// Function to search for a location
+async function searchLocation(query) {
+
+  var apiResponse = await fetch(`https://geocode.maps.co/search?q=${query}`);
+  var data = await apiResponse.json()
+  console.log(data)
+
+  resultLat = data[0]['lat']
+  resultLon = data[0]['lon']
+  console.log(resultLat)
+  console.log(resultLon)
+
+  map.setView([resultLat, resultLon], 8)
+
+}
+
+function createImageCarousel(imageUrls) {
+  var carouselContainer = document.createElement('div');
+  carouselContainer.id = 'carouselExampleIndicators';
+  carouselContainer.className = 'carousel slide';
+  carouselContainer.setAttribute('data-ride', 'carousel');
+
+  var indicatorsList = document.createElement('ol');
+  indicatorsList.className = 'carousel-indicators';
+
+  var carouselInner = document.createElement('div');
+  carouselInner.className = 'carousel-inner';
+
+  var prevControl = document.createElement('a');
+  prevControl.className = 'carousel-control-prev';
+  prevControl.href = '#carouselExampleIndicators';
+  prevControl.role = 'button';
+  prevControl.setAttribute('data-slide', 'prev');
+
+  var prevIcon = document.createElement('span');
+  prevIcon.className = 'carousel-control-prev-icon';
+  prevIcon.setAttribute('aria-hidden', 'true');
+
+  var prevText = document.createElement('span');
+  prevText.className = 'sr-only';
+  prevText.textContent = 'Previous';
+
+  prevControl.appendChild(prevIcon);
+  prevControl.appendChild(prevText);
+
+  var nextControl = document.createElement('a');
+  nextControl.className = 'carousel-control-next';
+  nextControl.href = '#carouselExampleIndicators';
+  nextControl.role = 'button';
+  nextControl.setAttribute('data-slide', 'next');
+
+  var nextIcon = document.createElement('span');
+  nextIcon.className = 'carousel-control-next-icon';
+  nextIcon.setAttribute('aria-hidden', 'true');
+
+  var nextText = document.createElement('span');
+  nextText.className = 'sr-only';
+  nextText.textContent = 'Next';
+
+  nextControl.appendChild(nextIcon);
+  nextControl.appendChild(nextText);
+
+  for (var i = 0; i < imageUrls.length; i++) {
+    var indicatorItem = document.createElement('li');
+    indicatorItem.setAttribute('data-target', '#carouselExampleIndicators');
+    indicatorItem.setAttribute('data-slide-to', i.toString());
+    if (i === 0) {
+      indicatorItem.className = 'active';
+    }
+
+    var carouselItem = document.createElement('div');
+    carouselItem.className = 'carousel-item';
+    if (i === 0) {
+      carouselItem.classList.add('active');
+    }
+
+    var image = document.createElement('img');
+    image.className = 'd-block w-100';
+    image.src = imageUrls[i];
+    image.alt = 'Slide ' + (i + 1).toString();
+
+    carouselItem.appendChild(image);
+    carouselInner.appendChild(carouselItem);
+    indicatorsList.appendChild(indicatorItem);
+  }
+
+  carouselContainer.appendChild(indicatorsList);
+  carouselContainer.appendChild(carouselInner);
+  carouselContainer.appendChild(prevControl);
+  carouselContainer.appendChild(nextControl);
+
+  return carouselContainer.outerHTML;
+}
+
+
+
 
 
 async function makeApiQuery() {
@@ -160,7 +264,8 @@ async function makeApiQuery() {
     console.log(data);
     var gifUrl = data.gifUrl;
     var zipUrl = data.zipUrl;
-
+    var dates = data.dates
+    var jgpUrls = data.jpgUrls
 
     // Get the latitude and longitude of the GIF from the response data
     const n =  data.n;
@@ -186,6 +291,11 @@ async function makeApiQuery() {
     gifButton.onclick = function() {
       window.open(gifUrl);
     };
+    //var carouselHTML = createImageCarousel(jpegUrls);
+
+    // Append the generated HTML to an element in your page
+    //var carouselContainer = document.getElementById('carouselContainer');
+    //carouselContainer.innerHTML = carouselHTML;
 
 
     showPage('results')

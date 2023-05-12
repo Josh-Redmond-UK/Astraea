@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="myChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function getChartData() {
+  // This would be replaced by a fetch() call to your API
+  return [
+    ['2023-05-01', 100],
+    ['2023-05-02', 120],
+    ['2023-05-03', 130],
+    ['2023-05-04', 80],
+    ['2023-05-05', 200],
+    ['2023-05-06', 170],
+    ['2023-05-07', 220],
+    ['2023-05-08', 190],
+    ['2023-05-09', 210],
+    ['2023-05-10', 240],
+  ];
+}
+
+function drawChart() {
+  const chartData = getChartData();
+  const ctx = document.getElementById('myChart').getContext('2d');
+
+  const dates = chartData.map(entry => entry[0]);
+  const values = chartData.map(entry => entry[1]);
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dates,
+      datasets: [{
+        label: 'My Dataset',
+        data: values,
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1
+      }]
+    },
+    options: {
+      scales: {
+        x: {
+          type: 'time',
+          time: {
+            unit: 'day'
+          }
+        },
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+drawChart();
+</script>
+
+</body>
+</html>

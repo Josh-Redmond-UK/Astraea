@@ -33,8 +33,11 @@ def generatePaths():
 
     
 
-    name, dates, paths, col, zipPath = webGeneratePaths(coords, (ee.Date(str(startDate)), ee.Date(str(endDate))), imageType, aggregationLength, aggregationType, 100)
-    gifPath = create_gif(paths, name)
+    name, dates, paths, col, zipPath, gifPath, jpegPaths = webGeneratePaths(coords, (ee.Date(str(startDate)), ee.Date(str(endDate))), imageType, aggregationLength, aggregationType, 100)
+    
+    print(dates)
+    print(type(dates))
+    #gifPath = create_gif(paths, name, dates)
     currentData = (name, dates, paths, col)
     roi = coordsToROI(coords).bounds(10)
     boundsGeom = roi.getInfo()['coordinates']
@@ -48,7 +51,7 @@ def generatePaths():
     sw = (s,w)
     ne = (n,e)
 
-    response = jsonify(name=name, dates=dates, s=s, e=e, w=w, n=n, gifUrl=gifPath, zipUrl=zipPath)
+    response = jsonify(name=name, dates=dates, s=s, e=e, w=w, n=n, gifUrl=gifPath, zipUrl=zipPath, tifPaths = paths, jpegUrls=jpegPaths)
 
     response.headers.add('Access-Control-Allow-Origin', '*')
 

@@ -135,6 +135,23 @@ button, #next {
   background-color: #3498db;
 }
 
+#search-button{
+
+  width:49%;
+  display:inline;
+}
+
+#search-input{
+width:49%;
+display:inline;
+  
+}
+#search-container{
+  width:90%;
+  margin: auto;
+
+}
+
 #indexNext {
   visibility: hidden;
 }

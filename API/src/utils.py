@@ -17,8 +17,24 @@ from tifffile.tifffile import TiffSequence
 from IPython.core.display import display
 import calendar
 import os.path
+from PIL import Image, ImageDraw, ImageSequence
+import io
 
-
+def convertToJpeg(framesPaths):
+    jpegPaths = []
+    for f in framesPaths:
+        print(f)
+        array = tifffile.imread(f)
+        #print(array.shape)
+        for band in range(array.shape[2]):
+            array[:,:,band] = ((array[:,:,band] - array[:,:,band].min()) * (1/(array[:,:,band].max() - array[:,:,band].min()) * 255)).astype(np.uint8)
+            print(array.max())
+            print(array.min())
+        im = Image.fromarray(array.astype(np.uint8))
+        p = "{f}.jpeg"
+        im.save(p)
+        jpegPaths.append(p)
+    return jpegPaths
 
 def coordsToROI(coords):
     stringList = coords.split(',')
@@ -31,9 +47,8 @@ def coordsToROI(coords):
 def clipImgCol(imgCol, roi):
     return imgCol.map(lambda x: x.clip(roi))
 
-def webGetZipPayload(images_list, roi, bands, title, dates, image_mode, area_string, framesPath, gifPath=None):
+def webGetZipPayload(images_list, roi, bands, title, dates, image_mode, area_string, framesPath, gifPath):
     paths = framesPath
-    gifPath = create_gif(framesPath, title)
     paths.append(gifPath)
     #paths = generate_maps(images_list, roi, bands, title, dates, image_mode, area_string, framesPath)
     zip_path = generate_zip(paths, title)
@@ -94,8 +109,12 @@ def webGeneratePaths(coordsList, dateRange, imageType, aggLength, aggType, maxCl
     col, name, dates = webGetCollection(roi, dateRange, maxCloud)
     col, bands, dates = webAggregateCollection(col, imageType, aggLength, aggType, dates)
     paths = downloadImages(col, bands, roi)
-    zipPath = webGetZipPayload(None, roi, None, name, dates, imageType, name, paths)
-    return name, dates, paths, col, zipPath
+    jpegPaths = paths
+    gifPath =  create_gif(paths, f'{name}.gif', dates=dates)
+    zipPath = webGetZipPayload(None, roi, None, name, dates, imageType, name, paths, gifPath=gifPath)
+   
+
+    return name, dates, paths, col, zipPath, gifPath, jpegPaths
 
 def clean_up_wd():
     tiffs = glob.glob("*.tif")
@@ -212,114 +231,6 @@ def ymdList(imgcol):
     ymd = imgcol.iterate(iter_func, ee.List([]))
     return ee.List(ymd).getInfo()
 
-
-def plot_raster_map():
-    pass
-
-class Area_Analysis(ee.ImageCollection):
-    def __init__(self, image_collection, gif_path, title, bands, bounds, image_mode, dates, framesPath):
-        super().__init__(image_collection)
-        
-        self.dates = dates
-        self.gif_path = gif_path
-        self.title = title
-        self.bands = bands
-        self.bounds = bounds
-        self.framesPath = framesPath
-        self.image_mode = image_mode
-
-    
-    def display(self):
-
-        im = Image.open(self.gif_path)
-
-        frames = 0
-        try:
-            while 1:
-                im.seek(im.tell()+1)
-                frames +=1
-
-        except EOFError:
-            pass 
-        
-        image_display = widgets.Output()
-        text_display = widgets.Output()
-                
-        image_display = widgets.Output()
-        play_button = widgets.Play(value=1, min=1, max=frames+1, step=1, interval=1000)
-        slider = widgets.IntSlider(value=1, min=1, max=frames+1)
-        widgets.jslink((play_button, 'value'), (slider, 'value'))
-        gifheight = im.size[1]
-        image_display.layout.height = f'{gifheight}px'
-        im.seek(1)
-        with image_display:
-            image_display.clear_output()
-            display(im)
-
-
-        def update_image_frame(b):
-                im.seek(slider.value)
-                with image_display:
-                    image_display.clear_output()
-                    display(im)
-        
-
-        slider.observe(update_image_frame)
-
-    
-        gif_controls = widgets.HBox([play_button, slider])
-        roi_analysis_widget = widgets.VBox([image_display, gif_controls])
-        return roi_analysis_widget
-
-    def export(self):
-        # Generates set of PDF maps with metadata for an observation and displays images for each frame in sequence
-        num_images = self.size().getInfo()
-
-        ee_images_list = self.toList(num_images)
-
-        bounds = self.bounds
-        dates = self.dates
-        title = self.title
-        image_mode = self.image_mode
-
-    
-        lon, lat = bounds.centroid(200).getInfo()['coordinates']
-        area_string = reverse_geocode_area(lon=lon, lat=lat)
-    
-        # Get bounds from earth engine
-        bounds_frame = pd.DataFrame(np.array(bounds.bounds().getInfo()['coordinates'][0]), columns=["Lon", "Lat"])
-        min_lon = bounds_frame['Lon'].min()
-        max_lon = bounds_frame['Lon'].max()
-        min_lat = bounds_frame['Lat'].min()
-        max_lat = bounds_frame['Lat'].max()
-
-
-        images_list = []
-
-        for i in range(num_images):
-            images_list.append(ee.Image(ee_images_list.get(i)))
-
-       # pickle_path = title+".pickle"
-
-       # with open(pickle_path, "wb") as handle:
-       #     pickle.dump(self, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        # Uses an fstring to create and serve an html download button containing the analysed data using lazy execution (to not delay the user)
-
-        #BUTTONS
-        html_buttons = f'''<html>
-        <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        </head>
-        <body>
-        <a download="{title+'.zip'}" href="data:text/csv;base64,{generate_and_serve_zip_payload(images_list, (min_lon, max_lon, min_lat, max_lat), self.bands, title, dates, image_mode, area_string, additional_paths=[self.gif_path], framesPath = self.framesPath)}" download>
-        <button class="p-Widget jupyter-widgets jupyter-button widget-button mod-warning">Download File</button>
-        </a>
-        </body>
-        </html>
-        '''
-
-        html_button = html_buttons#.format(payload=payload,filename=filename)
-        return html_button
 
 
 def generate_and_serve_zip_payload(images_list, bounds_tuple, bands, title, dates, image_mode, area_string, framesPath, additional_paths=None):
@@ -580,7 +491,7 @@ def get_imagecollection_download(img_col, roi):
 
     return downloaded_images
 
-def create_gif(frame_paths, title, fps=1):
+def create_gif(frame_paths, title, dates):
     images = [imageio.imread(path) for path in frame_paths]
     for i in images:
         print(i.shape)
@@ -588,6 +499,36 @@ def create_gif(frame_paths, title, fps=1):
     images = [np.clip(i/np.max(i)*255, 0, 255).astype(np.uint8) for i in images]
     gif_title = f'/Users/joshredmond/Documents/GitHub/Astraea/{title}.gif'
     imageio.mimsave(gif_title, images, duration=1000, loop=1000)
+
+    im = Image.open(gif_title)
+
+    # A list of the frames to be outputted
+    frames = []
+    # Loop over each frame in the animated image
+    for idx, frame in enumerate(ImageSequence.Iterator(im)):
+        # Draw the text on the frame
+        d = ImageDraw.Draw(frame)
+        d.text((0,0), dates[idx])
+        del d
+
+        # However, 'frame' is still the animated image with many frames
+        # It has simply been seeked to a later frame
+        # For our list of frames, we only want the current frame
+
+        # Saving the image without 'save_all' will turn it into a single frame image, and we can then re-open it
+        # To be efficient, we will save it to a stream, rather than to file
+        b = io.BytesIO()
+        frame.save(b, format="GIF")
+        frame = Image.open(b)
+        
+
+        # Then append the single frame image to a list of frames
+        frames.append(frame)
+    # Save the frames as a new image
+    frames[0].save(gif_title, save_all=True, append_images=frames[1:])
+
+
+
     return gif_title
     
 def download_gif(img_col, title="Animation", fps=1):
