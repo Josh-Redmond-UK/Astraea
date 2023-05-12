@@ -121,6 +121,11 @@ button, #next {
   background-color: var(--primary-color);
 }
 
+.buttonGroup{
+display:block;
+
+}
+
 #next-button {
   margin-top: 2em;
   padding: 0.5em 1em;

@@ -17,10 +17,21 @@ function getGoogleSatelliteTiles(){
   var googleSateliteBasemap = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    subdomains:['mt0','mt1','mt2','mt3']
+    subdomains:['mt0','mt1','mt2','mt3'],
+    opacity:0.4
 })
 
 return googleSateliteBasemap
+}
+
+function getGoogleTerrainTiles(){
+  var googleTerrainBasemap = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    subdomains:['mt0','mt1','mt2','mt3']
+})
+
+return googleTerrainBasemap
 }
 
 function getOSMTiles(){
@@ -38,12 +49,17 @@ return osmTiles
 
 
 var map = L.map('IndMap').setView([23.6345, -102.5528], 5);
-
 var settingsMap = L.map('settingsMap').setView([23.6345, -102.5528], 5);
 var resultsMap = L.map('resultsMap').setView([23.6345, -102.5528], 5);
 
+var indBase = getGoogleTerrainTiles().addTo(map)
 var indBase = getGoogleSatelliteTiles().addTo(map)
+
+var settingsBase = getGoogleTerrainTiles().addTo(settingsMap)
 var settingsBase = getGoogleSatelliteTiles().addTo(settingsMap)
+
+
+var resultsBase = getGoogleTerrainTiles().addTo(resultsMap)
 var resultsBase = getGoogleSatelliteTiles().addTo(resultsMap)
 
 
@@ -334,6 +350,26 @@ document.getElementById('indexNext').addEventListener('click', function() {
 
 })
 
+function goLatLon(){
+// DD = d + (min/60) + (sec/3600)
+var latdeg = +(document.getElementById('latDeg').value)
+var latmin = +(document.getElementById('latMin').value)
+var latsec = +(document.getElementById('latSec').value)
+
+
+var londeg = +(document.getElementById('lonDeg').value)
+var lonmin = +(document.getElementById('lonMin').value)
+var lonsec = +(document.getElementById('lonSec').value)
+
+var LonDD = londeg + (lonmin/60) + (lonsec/3600)
+var LatDD = latdeg + (latmin/60) + (latsec/3600) 
+LonDD = LonDD * -1
+//console.log()
+map.setView([LatDD, LonDD], 8)
+
+}
+
+
 function showPage(pageId) {
   $('.page').removeClass('active');
   $('#' + pageId).addClass('active');
@@ -341,7 +377,7 @@ function showPage(pageId) {
   settingsMap.invalidateSize();
   resultsMap.invalidateSize();
   disableMapInteraction(settingsMap)
-  disableMapInteraction(resultsMap)
+  //disableMapInteraction(resultsMap)
 
   }
 //document.getElementById("query-button").addEventListener("click",makeApiQuery)

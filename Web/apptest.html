@@ -51,8 +51,27 @@
             <div class="map" id="IndMap"></div>
                
             <div id="search-container">
-              <input type="text" id="search-input" placeholder="Search for a location">
-              <button id="search-button">Search</button>
+              <input type="text" id="search-input" placeholder="Buscar Para un Lugar">
+              <button id="search-button">Buscar</button>
+            </div>
+            <div class="box" id="latLonContainer">
+              <div class="left">
+              <div class="buttonGroup" id="Lat">  
+                Lat
+              <input type="text" id="latDeg" placeholder="Gradios">
+              <input type="text" id="latMin" placeholder="Minutes">
+              <input type="text" id="latSec" placeholder="Segundos">
+              </div>
+              <div class="buttonGroup" id="Lon">
+                Lon
+                <input type="text" id="lonDeg" placeholder="Gradios">
+                <input type="text" id="lonMin" placeholder="Minutes">
+                <input type="text" id="lonSec" placeholder="Segundos">
+              </div>
+              <button id="latLonButton", onclick=goLatLon()>Ir</button>
+              
+            </div>
+
             </div>
             <button id="draw-polygon-btn">Dibujar un Poligono</button>
 
