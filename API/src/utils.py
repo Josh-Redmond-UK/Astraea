@@ -16,6 +16,11 @@ import glob
 from tifffile.tifffile import TiffSequence
 from IPython.core.display import display
 import calendar
+import multiprocess
+
+import logging
+from retry import retry
+
 import os.path
 from PIL import Image, ImageDraw, ImageSequence
 import io
@@ -113,7 +118,7 @@ def webGeneratePaths(coordsList, dateRange, imageType, aggLength, aggType, maxCl
     gifPath =  create_gif(paths, f'{name}.gif', dates=dates)
     zipPath = webGetZipPayload(None, roi, None, name, dates, imageType, name, paths, gifPath=gifPath)
    
-
+    # ok averages??
     return name, dates, paths, col, zipPath, gifPath, jpegPaths
 
 def clean_up_wd():
@@ -452,6 +457,27 @@ def generate_zip(paths, title):
             zipObj2.write(p)
 
     return zip_path
+    
+@retry(tries=10, delay=1, backoff=2)
+def downloadImage(idx, imgROI):
+    img, roi = imgROI
+    test_url = img.getDownloadURL(params={
+        "format" : "GEO_TIFF",
+        "scale": 10,
+        "region":roi})
+    #print(test_url)
+    test_r = requests.get(test_url, stream=True)
+    #print(test_url)
+    #print(test_r)
+    path = os.path.dirname(__file__) + f'/../../../{idx}.tif'
+
+    #path = './frame'+str(idx)+'.tif'
+    #print( test_r.status_code)
+    assert test_r.status_code == 200
+    with open(path, 'wb') as f:
+        test_r.raw.decode_content = True
+        shutil.copyfileobj(test_r.raw, f)
+    return (path, idx)
 
 def get_imagecollection_download(img_col, roi):
     num_images = img_col.size().getInfo()
@@ -464,32 +490,23 @@ def get_imagecollection_download(img_col, roi):
 
     downloaded_images = []
     #progressBar = widgets.IntProgress(value = 0, min = 0, max = len(images_list))
-    for idx, img in enumerate(images_list):
+    roi_list = [roi for x in images_list]
+    paramsList = list(zip(images_list,roi_list))
+
+    pool = multiprocess.Pool(25)
+    downloaded_images = pool.starmap(downloadImage, enumerate(paramsList))
+    pool.close()
+
     #reproject("EPSG:3857")
         #img = ee.Image.constant(0).clip(roi).add(img)
         #scale = convert_image_resolution(img, 1440).nominalScale()
     
     
-        test_url = img.getDownloadURL(params={
-            "format" : "GEO_TIFF",
-            "scale": 10,
-            "region":roi})
-        #print(test_url)
-        test_r = requests.get(test_url, stream=True)
-        #print(test_url)
-        #print(test_r)
-        path = os.path.dirname(__file__) + f'/../../../{idx}.tif'
-
-        #path = './frame'+str(idx)+'.tif'
-        #print( test_r.status_code)
-        assert test_r.status_code == 200
-        with open(path, 'wb') as f:
-            test_r.raw.decode_content = True
-            shutil.copyfileobj(test_r.raw, f)
-        downloaded_images.append(path)
         #progressBar.value += 1 
-
-    return downloaded_images
+    #downloaded_images.sort()
+    images, idxs = zip(*downloaded_images)
+    
+    return images
 
 def create_gif(frame_paths, title, dates):
     images = [imageio.imread(path) for path in frame_paths]
