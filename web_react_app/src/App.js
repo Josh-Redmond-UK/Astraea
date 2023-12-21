@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SidebarAlt from './components/SidebarAlt';
-import InteractiveMap from './components/InteractiveMap';
 import './App.css';
+import InteractiveMap from './components/InteractiveMap';
 import 'leaflet/dist/leaflet.css';
 import { UserFlowContext } from './contexts/UserFlowContext';
 import { DrawingContext } from './contexts/DrawingContext';
