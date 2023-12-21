@@ -25,6 +25,15 @@ import os.path
 from PIL import Image, ImageDraw, ImageSequence
 import io
 
+def lognormalise(image, bottom_pct=1, top_pct=100):
+    image = np.nan_to_num(image)
+    image = np.log(image)
+    min = np.percentile(image.flatten(), bottom_pct)
+    max = np.percentile(image.flatten(), top_pct)
+    image = (image - min)/(max-min)
+    return image
+
+
 def convertToJpeg(framesPaths):
     jpegPaths = []
     for f in framesPaths:
@@ -32,7 +41,7 @@ def convertToJpeg(framesPaths):
         array = tifffile.imread(f)
         #print(array.shape)
         for band in range(array.shape[2]):
-            array[:,:,band] = ((array[:,:,band] - array[:,:,band].min()) * (1/(array[:,:,band].max() - array[:,:,band].min()) * 255)).astype(np.uint8)
+            array[:,:,band] = (lognormalise(band) * 255).astype(np.uint8)
             print(array.max())
             print(array.min())
         im = Image.fromarray(array.astype(np.uint8))
@@ -69,7 +78,7 @@ def webGetCollection(roi, dateRange, maxCloud=100):
     'CLOUDY_PIXEL_PERCENTAGE', 'less_than',maxCloud).filterBounds(areaOfInterest)
     dates = ymdList(s2Collection)
 
-    s2Clipped = clipImgCol(s2Collection, roi)
+    s2Clipped = s2Collection.map(lambda x: x.clip(roi))
 
     cLon, cLat = areaOfInterest.centroid(200).getInfo()['coordinates']
     areaName = reverse_geocode_area(cLon, cLat)
@@ -168,7 +177,6 @@ def get_BAIS2(image):
 def add_BAIS2(image):
     return image.cat(get_BAIS2(image), image.select("B3").divide(10000), image.select("B2").divide(10000))
 
-
 def get_NBR(image):
     nbr_3 = image.normalizedDifference(['B8', 'B12']).rename('constant')
     return nbr_3
@@ -191,19 +199,13 @@ def get_Green_Grey_Blue_Index(image):
 
     return red.addBands([green, blue])
 
-
-
-
 def get_NDVI(image):
     NDVI = image.normalizedDifference(['B8', 'B4']).rename("constant")
     return NDVI
 
 
 def add_NDVI(image):
-    return image.addBands([get_NDVI(image)]).select(["B4","constant", "B2"])
-    
-
-
+    return image.addBands([get_NDVI(image)]).select(["B4","constant", "B2"])    
 
 def create_dummy_input_frame():
 
@@ -263,19 +265,14 @@ def convert_image_resolution(image, gif_size=1280):
         return proj.atScale(new_scale)
 
 def downscale_image(image, max_image_size = 1280):
-    #max_image_size = 1920
     new_projection = convert_image_resolution(image, max_image_size)
 
-    #downscaled = image.reduceResolution(ee.Reducer.mean(),bestEffort=True).reproject(new_projection)
     downscaled = image.reproject(new_projection)
-    #print("downscaling completed")
     return downscaled
 
-#def reproject_imgcol()
 
 
 def aggregate_monthly(img_col, datelist, mode="Mean"):
-    #datelist = ymdList(img_col)
     dates_conv = pd.to_datetime(datelist, dayfirst=False)
     months = []
     for d in dates_conv:
@@ -370,12 +367,6 @@ def aggregate_anually(img_col, datelist, mode="Mean"):
 
     return (ee.ImageCollection(annual_composites), starts)
 
-                        
-                        
-                        
-    
-#
-
 
 def generate_maps(images_list, roi, bands, title, dates, image_mode, area_string, framesPath):
     bounds_frame = pd.DataFrame(np.array(roi.bounds().getInfo()['coordinates'][0]), columns=["Lon", "Lat"])
@@ -459,20 +450,16 @@ def generate_zip(paths, title):
     return zip_path
     
 @retry(tries=10, delay=1, backoff=2)
-def downloadImage(idx, imgROI):
+def downloadImage(idx, imgROI, scale=10, folderName = "name/"):
     img, roi = imgROI
     test_url = img.getDownloadURL(params={
         "format" : "GEO_TIFF",
-        "scale": 10,
+        "scale": scale,
         "region":roi})
-    #print(test_url)
-    test_r = requests.get(test_url, stream=True)
-    #print(test_url)
-    #print(test_r)
-    path = os.path.dirname(__file__) + f'/../../../{idx}.tif'
 
-    #path = './frame'+str(idx)+'.tif'
-    #print( test_r.status_code)
+
+    test_r = requests.get(test_url, stream=True)
+    path = os.path.dirname(__file__) + folderName + f'{idx}.tif'
     assert test_r.status_code == 200
     with open(path, 'wb') as f:
         test_r.raw.decode_content = True
@@ -554,3 +541,37 @@ def download_gif(img_col, title="Animation", fps=1):
     return frame_paths
 
 
+def image_to_average(image, imageType):
+    means = np.mean(image, axis=-1)
+
+
+def get_metrics(image_collection, bands, dates):
+    image_collection.reduce(ee.Reducer.mean())
+
+
+def download_image(img, roi, name):
+    img.getDown
+    
+
+
+class Analysis():
+    def __init__(self, imageType, endDate, startDate, aggType, aggLength, coords):
+        self.imageType = imageType
+        self.endDate = endDate
+        self.startDate = startDate
+        self.dateRange = (startDate, endDate)
+        self.aggType = aggType
+        self.aggLength = aggLength
+        self.coords = coords
+        self.roi = coordsToROI(self.coords)
+
+    def prepare_collection(self):
+        collection, name, dates = webGetCollection(self.roi, self.dateRange)
+        collection, bands, dates = webAggregateCollection(collection, self.imageType, self.aggLength, self.aggType, dates)
+        self.collection = collection
+        self.bands = bands
+        self.dateList = dates
+        self.areaName = name
+
+    def download_images(self):
+        pass

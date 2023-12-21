@@ -11,3 +11,7 @@ tifffile
 matplotlib
 imageio
 flask
+notebook
+pytest
+multiprocess
+retry

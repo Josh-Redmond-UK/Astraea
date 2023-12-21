@@ -1,0 +1,16 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2px;
+}
+
+.brush .selection {
+    stroke: steelblue;
+    stroke-width: 2px;
+    fill: lightblue;
+    fill-opacity: 0.125;
+}
