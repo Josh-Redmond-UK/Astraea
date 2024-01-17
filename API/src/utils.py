@@ -50,13 +50,6 @@ def convertToJpeg(framesPaths):
         jpegPaths.append(p)
     return jpegPaths
 
-def coordsToROI(coords):
-    stringList = coords.split(',')
-    coordsNum = [float(x) for x in stringList]
-    it = iter(coordsNum)
-    coords = [*zip(it, it)]
-    roi = ee.Geometry.Polygon(coords).bounds()
-    return roi
 
 def clipImgCol(imgCol, roi):
     return imgCol.map(lambda x: x.clip(roi))

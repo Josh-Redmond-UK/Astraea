@@ -21,7 +21,6 @@ function App() {
   });
 
   const updateDrawingData = (newData) => {
-    console.log('updating drawing data')
     setDrawingData({...drawingData, ...newData})
   };
 

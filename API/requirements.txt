@@ -5,7 +5,6 @@ ipyleaflet
 shapely
 geojson
 geemap
-voila 
 geopy
 tifffile
 matplotlib
@@ -15,3 +14,8 @@ notebook
 pytest
 multiprocess
 retry
+pydantic
+fastapi
+uvicorn[standard]
+python-dateutil
+httpx
