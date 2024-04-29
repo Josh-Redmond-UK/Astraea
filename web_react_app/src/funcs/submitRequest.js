@@ -1,5 +1,5 @@
 async function submitRequest(drawingData){
-    const apiQueryString = `http://127.0.0.1:5000/api/mapping?coords=${drawingData.points}&start-date=${drawingData.startDate}&end-date=${drawingData.endDate}&imagery-type=${drawingData.imageMode}&aggregation-length=${drawingData.aggLenth}&aggregation-type=${drawingData.aggType}`;
+    const apiQueryString = `http://127.0.0.1:8000/api/mapping?roi=${drawingData.points}&cloud_cover=100&start_date=${drawingData.startDate}&end_date=${drawingData.endDate}&image_type=${drawingData.imageMode}&aggregation_length=${drawingData.aggLenth}&aggregation_type=${drawingData.aggType}`;
     console.log(apiQueryString)
     /// Make query
     var response = await fetch(apiQueryString);
@@ -7,7 +7,8 @@ async function submitRequest(drawingData){
     if (response.ok) {
 
 
-    var data = await response.json();}
+    var data = await response.json();
+    return data}
 
 
 

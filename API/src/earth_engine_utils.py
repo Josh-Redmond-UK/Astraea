@@ -151,14 +151,14 @@ def aggregate_collection(image_collection:ee.imagecollection, aggregation_type:s
         case "monthly":
             image_collection = ee.ImageCollection([agg_func(image_collection.filterDate(month[0], month[1])).setDefaultProjection("EPSG:3857", scale=10) for month in get_months(start_date, end_date)])
             #image_collection = ee.List(get_months(start_date, end_date)).map(lambda month: agg_func(image_collection.filterDate(month[0], month[1])))
-        case "yearly":
+        case "annual":
             #image_collection = ee.List(get_years(start_date, end_date)).map(lambda month: agg_func(image_collection.filterDate(month[0], month[1])))
             image_collection = ee.ImageCollection([agg_func(image_collection.filterDate(year[0], year[1])).setDefaultProjection("EPSG:3857", scale=10) for year in get_years(start_date, end_date)])
-        case "None":
+        case "none":
             #print("No aggregation returning median for whole collection yolo") 
             image_collection = ee.ImageCollection([image_collection.median()])
         case _:
-            raise ValueError(f'Aggregation length {aggregation_length} is not supported. Please use monthly, yearly, or None.')
+            raise ValueError(f'Aggregation length {aggregation_length} is not supported. Please use Monthly, Annual, or None.')
 
 
     

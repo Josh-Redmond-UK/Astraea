@@ -40,14 +40,14 @@ def float_to_int(arr:np.ndarray) -> np.ndarray:
 
 def get_download_requests(params:dict) -> list[str]:
 
-    collection = get_images_for_extent(params['roi'], params['start_date'], params['end_date'], params['cloud_cover'], params['image_type'])
+    collection = get_images_for_extent(params['roi'], params['startDate'], params['endDate'], params['cloudCover'], params['imageMode'])
 
 
 
 
 
-    if params['aggregation_type'] != 'None' or params['aggregation_length'] != 'None':
-        collection = aggregate_collection(collection, params['aggregation_type'], params['aggregation_length'], params['start_date'], params['end_date'])
+    if params['aggType'] != 'None' or params['aggLength'] != 'None':
+        collection = aggregate_collection(collection, params['aggType'], params['aggLength'], params['startDate'], params['endDate'])
     
     collection = collection.map(lambda image: image.clip(coordsToROI(params['roi'])))
 
@@ -123,7 +123,7 @@ def generate_statistics(image_paths: list[str]) -> list[dict]:
     return stats_list
 
 
-def handle_request(params:dict) -> dict:
+async def handle_request(params:dict) -> dict:
     ''' Returns a dictionary of the results of the specified request.'''
 
     # Get the download requests

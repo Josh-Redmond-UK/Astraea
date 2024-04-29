@@ -25,7 +25,7 @@ const InteractiveMap = () => {
       if (drawing) {
         try {
           const drawnPoints = await mapRef.current.startDraw();
-          updateDrawingData({ points: drawnPoints });
+          updateDrawingData({ roi: drawnPoints });
           
           toggleDrawing(); // Toggle drawing state
           incrementStep(1); // Increment step in user flow

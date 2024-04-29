@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenRuler, faFire, faSeedling, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { DrawingDataContext } from '../contexts/DrawingDataContext'
 import { UserFlowContext } from '../contexts/UserFlowContext'
+import { submitRequest } from '../funcs/submitRequest'
 const ParameterSelection = () => {
 
   const { drawingData, updateDrawingData } = useContext(DrawingDataContext);
@@ -32,9 +33,9 @@ const ParameterSelection = () => {
         <select className="select select-bordered w-full max-w-xs" value={drawingData.imageMode} 
         onChange={e => updateDrawingData({imageMode:e.target.value})}>
         <option disabled selected>Imagery Type</option>
-        <option value={"true_colour"}>📷 True Colour</option>
-        <option> value={"ndvi"}🌳 Vegetation (NDVI)</option>
-        <option value={"bais2"}>🔥 Burn (BAIS2)</option>
+        <option value={"Colour"}>📷 True Colour</option>
+        <option> value={"NDVI"}🌳 Vegetation (NDVI)</option>
+        <option value={"BAIS2"}>🔥 Burn (BAIS2)</option>
         </select>
         <p className='text-lg mt-4'>Aggregation Type</p>
         <select className="select select-bordered w-full max-w-xs" value={drawingData.aggType} 
@@ -53,7 +54,23 @@ const ParameterSelection = () => {
         <option value={"annual"}>Annual</option>
         <option value={"none"}>None</option>
         </select>
-        <button className="btn btn-primary w-full mt-4" onClick={() => {console.log(drawingData)}}>Run Analysis</button>
+        <button className="btn btn-primary w-full mt-4" onClick={async () => {
+          console.log(JSON.stringify(drawingData).toString())
+          let test_params = JSON.stringify(drawingData).toString()
+          let req_str = "?params=" + test_params
+          console.log(req_str)
+          let url = "http://127.0.0.1:8000/api/mapping" 
+          const apiQueryString = url + req_str
+          var response = await fetch(apiQueryString);
+
+          if (response.ok) {
+
+
+          var data = await response.json()
+          console.log(data)}
+
+
+        }}>Run Analysis</button>
         <button className="btn btn-primary w-full mt-4" onClick={() => {incrementStep(-1)}}>Go Back</button>
     </div>
   )

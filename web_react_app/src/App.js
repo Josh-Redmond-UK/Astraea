@@ -12,9 +12,10 @@ function App() {
   const incrementStep = (x) => setStep(step + x);
 
   const [drawingData, setDrawingData] = useState({
-    points: null,
+    roi: null,
     startDate: null,
     endDate: null,
+    cloudCover: 100,
     imageMode: null,
     aggType: null,
     aggLength: null
