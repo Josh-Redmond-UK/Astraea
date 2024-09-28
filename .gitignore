@@ -10,3 +10,5 @@ Testweb/script.js
 Testweb/style.css
 *.png
 *.ipynb
+.DS_Store
+API/src/.DS_Store
