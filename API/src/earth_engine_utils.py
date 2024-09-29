@@ -1,6 +1,7 @@
 import ee
 from .date_time_utils import *
 from datetime import datetime
+import asyncio
 
 
 def get_BAIS2(image):

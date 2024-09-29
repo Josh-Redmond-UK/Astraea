@@ -1,4 +1,5 @@
-from utils import *
+from src.utils import *
+from src.api_utils import handle_request
 from flask import Flask
 from flask import request, jsonify
 from flask_cors import CORS
@@ -18,19 +19,24 @@ def helloWorld():
 
 @app.route('/api/mapping', methods=['GET'])
 def generatePaths():
+    print(request.args)
+    data = request.args['params']
+    print(data)
     clean_up_wd()
+    print("handling request for data", data)
+    handle_request(data)
+
     zipPayload = None
-    imageType = request.args['imagery-type']
+    imageType = data['image_type']
     print("image type", imageType)
-    endDate = request.args['end-date']
-    startDate = request.args['start-date']
+    endDate = data['end_date']
+    startDate = data['start_date']
 
-    aggregationType = request.args['aggregation-type']
+    aggregationType = data['aggregation_type']
     print("aggtype", aggregationType)
-    aggregationLength = request.args['aggregation-length']
+    aggregationLength = data['aggregation_length']
     print("agglength", aggregationLength)
-    coords = request.args["coords"]
-
+    coords = data["roi"]
     
 
     name, dates, paths, col, zipPath, gifPath, jpegPaths = webGeneratePaths(coords, (ee.Date(str(startDate)), ee.Date(str(endDate))), imageType, aggregationLength, aggregationType, 100)
@@ -61,7 +67,7 @@ def generatePaths():
 @app.route('/api/mapping/download', methods=['GET'])
 def serveZip():
     if zipPayload!= None:
-        foo
+        pass
     else:
         name, dates, paths, col = currentData
 

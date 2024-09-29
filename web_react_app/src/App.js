@@ -13,12 +13,12 @@ function App() {
 
   const [drawingData, setDrawingData] = useState({
     roi: null,
-    startDate: null,
-    endDate: null,
-    cloudCover: 100,
-    imageMode: null,
-    aggType: null,
-    aggLength: null
+    start_date: null,
+    end_date: null,
+    cloud_cover: 100,
+    image_type: null,
+    agg_type: null,
+    agg_length: null
   });
 
   const updateDrawingData = (newData) => {

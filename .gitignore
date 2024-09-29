@@ -12,3 +12,6 @@ Testweb/style.css
 *.ipynb
 .DS_Store
 API/src/.DS_Store
+__pycache__/*
+*.pyc
+*.pyc

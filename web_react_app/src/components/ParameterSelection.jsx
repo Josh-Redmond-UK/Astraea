@@ -20,26 +20,26 @@ const ParameterSelection = () => {
         <div className="join mt-2 w-max">
             <div className='join-item w-1/2 mr-1'>
                 <p className='text-center'> Start Date </p>
-                <input className='input ' type="date" value={drawingData.endDate} 
-                onChange={e => updateDrawingData({startDate:e.target.value})}></input>
+                <input className='input ' type="date" value={drawingData.start_date} 
+                onChange={e => updateDrawingData({start_date:e.target.value})}></input>
             </div>
             <div className='join-item w-1/2 right-1'>
                 <p className='text-center'> End Date </p> 
-                <input className='input' type="date" value={drawingData.endDate} 
-                onChange={e => updateDrawingData({endDate:e.target.value})}></input>
+                <input className='input' type="date" value={drawingData.end_date} 
+                onChange={e => updateDrawingData({end_date:e.target.value})}></input>
             </div>
         </div>
         <p className='text-lg mt-4'>Image Type</p>
-        <select className="select select-bordered w-full max-w-xs" value={drawingData.imageMode} 
-        onChange={e => updateDrawingData({imageMode:e.target.value})}>
+        <select className="select select-bordered w-full max-w-xs" value={drawingData.image_type} 
+        onChange={e => updateDrawingData({image_type:e.target.value})}>
         <option disabled selected>Imagery Type</option>
         <option value={"Colour"}>📷 True Colour</option>
-        <option> value={"NDVI"}🌳 Vegetation (NDVI)</option>
+        <option value={"NDVI"}>🌳 Vegetation (NDVI)</option>
         <option value={"BAIS2"}>🔥 Burn (BAIS2)</option>
         </select>
         <p className='text-lg mt-4'>Aggregation Type</p>
-        <select className="select select-bordered w-full max-w-xs" value={drawingData.aggType} 
-        onChange={e => updateDrawingData({aggType:e.target.value})}>
+        <select className="select select-bordered w-full max-w-xs" value={drawingData.agg_type} 
+        onChange={e => updateDrawingData({agg_type:e.target.value})}>
         <option disabled selected>Aggregation Type</option>
         <option value={"median"}>Median</option>
         <option value={"mean"}>Mean</option>
@@ -47,8 +47,8 @@ const ParameterSelection = () => {
         <option value={"none"}>None</option>
         </select>
         <p className='text-lg mt-4'>Aggregation Length</p>
-        <select className="select select-bordered w-full max-w-xs" value={drawingData.aggLength} 
-        onChange={e => updateDrawingData({aggLength:e.target.value})}>
+        <select className="select select-bordered w-full max-w-xs" value={drawingData.agg_length} 
+        onChange={e => updateDrawingData({agg_length:e.target.value})}>
         <option disabled>Aggregation Length</option>
         <option value={"monthly"}>Monthly</option>
         <option value={"annual"}>Annual</option>
@@ -59,7 +59,7 @@ const ParameterSelection = () => {
           let test_params = JSON.stringify(drawingData).toString()
           let req_str = "?params=" + test_params
           console.log(req_str)
-          let url = "http://127.0.0.1:8000/api/mapping" 
+          let url = "http://127.0.0.1:5000/api/mapping" 
           const apiQueryString = url + req_str
           var response = await fetch(apiQueryString);
 
