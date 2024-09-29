@@ -1,7 +1,6 @@
 from src.utils import *
 from src.api_utils import handle_request
-from flask import Flask
-from flask import request, jsonify
+from flask import Flask, send_file, request, jsonify
 from flask_cors import CORS
 import json
 
@@ -14,20 +13,31 @@ global currentData
 global zipPayload
 global activeCollection
 
-@app.route('/')
-def helloWorld():
-    return "hello!"
+last_analysis_result = None
 
 @app.route('/api/mapping', methods=['GET'])
-def generatePaths():
-    print(request.args)
+def generate_paths():
+    global last_analysis_result
     data = json.loads(request.args['params'])
-    print(data)
     clean_up_wd()
-    print("handling request for data", data)
     response = handle_request(data)
-    print("response", response)
-    return response
+    
+    # Store the full response for the stats endpoint
+    last_analysis_result = response
+    
+    # Send the GIF file
+    return send_file(response['GifUrl'], mimetype='image/gif')
+
+@app.route('/api/stats', methods=['GET'])
+def get_stats():
+    global last_analysis_result
+    if last_analysis_result is None:
+        return jsonify({"error": "No analysis has been run yet"}), 404
+    
+    return jsonify({
+        "Stats": last_analysis_result['Stats'],
+        "ImgUrls": last_analysis_result['ImgUrls']
+    })
 
 
 @app.route('/api/mapping/download', methods=['GET'])

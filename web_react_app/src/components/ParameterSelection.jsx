@@ -4,7 +4,7 @@ import { faPenRuler, faFire, faSeedling, faCamera } from '@fortawesome/free-soli
 import { DrawingDataContext } from '../contexts/DrawingDataContext'
 import { UserFlowContext } from '../contexts/UserFlowContext'
 
-const ParameterSelection = ({ setAnalysisResults }) => {
+const ParameterSelection = ({ onAnalysisComplete }) => {
   const { drawingData, updateDrawingData } = useContext(DrawingDataContext);
   const { step, incrementStep } = useContext(UserFlowContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -12,27 +12,34 @@ const ParameterSelection = ({ setAnalysisResults }) => {
   const handleAnalysis = async () => {
     setIsLoading(true);
     try {
-      console.log(JSON.stringify(drawingData).toString());
-      let test_params = JSON.stringify(drawingData).toString();
-      let req_str = "?params=" + test_params;
-      console.log(req_str);
-      let url = "http://127.0.0.1:5000/api/mapping";
-      const apiQueryString = url + req_str;
-      var response = await fetch(apiQueryString);
+      let params = JSON.stringify(drawingData);
+      let url = "http://127.0.0.1:5000/api";
 
-      if (response.ok) {
-        var data = await response.json();
-        console.log(data);
-        setAnalysisResults(data);  // This will update the state in App.js
-      } else {
-        console.error('Error in API response');
-      }
+      // First API call to get the GIF
+      const gifResponse = await fetch(`${url}/mapping?params=${params}`);
+      if (!gifResponse.ok) throw new Error('Failed to fetch GIF');
+      const gifBlob = await gifResponse.blob();
+      const gifUrl = URL.createObjectURL(gifBlob);
+
+      // Second API call to get the stats
+      const statsResponse = await fetch(`${url}/stats`);
+      if (!statsResponse.ok) throw new Error('Failed to fetch stats');
+      const statsData = await statsResponse.json();
+
+      // Combine the results and pass them to the parent component
+      onAnalysisComplete({
+        GifUrl: gifUrl,
+        ImgUrls: statsData.ImgUrls,
+        Stats: statsData.Stats
+      });
     } catch (error) {
       console.error('Error during analysis:', error);
+      // Handle error (e.g., show error message to user)
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div>

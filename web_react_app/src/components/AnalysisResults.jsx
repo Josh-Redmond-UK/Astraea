@@ -17,8 +17,8 @@ const AnalysisResults = ({ data, onBack }) => {
     <div className="analysis-results p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Analysis Results</h2>
-        <button 
-          onClick={onBack} 
+        <button
+          onClick={onBack}
           className="btn btn-primary"
         >
           Back to Map

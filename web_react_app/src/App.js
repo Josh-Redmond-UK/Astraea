@@ -26,20 +26,16 @@ function App() {
   const [drawing, setDrawing] = useState(false);
   const toggleDrawing = () => setDrawing(!drawing);
 
-  // State for analysis results
+  // New state for analysis results and sidebar visibility
   const [analysisResults, setAnalysisResults] = useState(null);
-
-  // New state for sidebar visibility
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
 
-  // Function to set analysis results and hide sidebar
-  const setAnalysisResultsAndHideSidebar = (results) => {
+  const handleAnalysisComplete = (results) => {
     setAnalysisResults(results);
     setIsSidebarVisible(false);
   };
 
-  // Function to clear results and show sidebar
-  const clearResultsAndShowSidebar = () => {
+  const handleBackToMap = () => {
     setAnalysisResults(null);
     setIsSidebarVisible(true);
   };
@@ -52,16 +48,13 @@ function App() {
             {/* Sidebar */}
             {isSidebarVisible && (
               <div className="absolute top-0 left-0 h-full z-10">
-                <SidebarAlt setAnalysisResults={setAnalysisResultsAndHideSidebar} />
+                <SidebarAlt onAnalysisComplete={handleAnalysisComplete} />
               </div>
             )}
             {/* Main Content */}
             <div className={`relative z-0 ${isSidebarVisible ? 'ml-80' : 'ml-0'}`}>
               {analysisResults ? (
-                <AnalysisResults 
-                  data={analysisResults} 
-                  onBack={clearResultsAndShowSidebar}
-                />
+                <AnalysisResults data={analysisResults} onBack={handleBackToMap} />
               ) : (
                 <InteractiveMap />
               )}

@@ -4,7 +4,7 @@ import DrawControl from './DrawControl';
 import ParameterSelection from './ParameterSelection';
 import { UserFlowContext } from '../contexts/UserFlowContext';
 
-const SidebarAlt = ({ setAnalysisResults }) => {
+const SidebarAlt = ({ onAnalysisComplete }) => {
     const {step, incrementStep} = useContext(UserFlowContext);
     return (
         <div className="drawer lg:drawer-open">
@@ -24,7 +24,7 @@ const SidebarAlt = ({ setAnalysisResults }) => {
                     <div className="divider"></div>
                     {
                         step === 1 ? <DrawControl/> : 
-                        step === 2 ? <ParameterSelection setAnalysisResults={setAnalysisResults} /> : 
+                        step === 2 ? <ParameterSelection onAnalysisComplete={onAnalysisComplete} /> : 
                         <SearchOptions />
                     }
                 </ul>
