@@ -39,15 +39,16 @@ def float_to_int(arr:np.ndarray) -> np.ndarray:
 
 
 def get_download_requests(params:dict) -> list[str]:
-
+    print("download request params", params)
+    print(type(params))
     collection = get_images_for_extent(params['roi'], params['start_date'], params['end_date'], params['cloud_cover'], params['image_type'])
 
 
 
 
 
-    if params['aggregation_type'] != 'None' or params['aggregation_length'] != 'None':
-        collection = aggregate_collection(collection, params['aggregation_type'], params['aggregation_length'], params['start_date'], params['end_date'])
+    if params['agg_type'] != 'None' or params['agg_length'] != 'None':
+        collection = aggregate_collection(collection, params['agg_type'], params['agg_length'], params['start_date'], params['end_date'])
     
     collection = collection.map(lambda image: image.clip(coordsToROI(params['roi'])))
 

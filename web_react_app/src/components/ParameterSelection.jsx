@@ -1,14 +1,38 @@
-import React, {useContext} from 'react'
+import React, { useContext, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenRuler, faFire, faSeedling, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { DrawingDataContext } from '../contexts/DrawingDataContext'
 import { UserFlowContext } from '../contexts/UserFlowContext'
-import { submitRequest } from '../funcs/submitRequest'
-const ParameterSelection = () => {
 
+const ParameterSelection = ({ setAnalysisResults }) => {
   const { drawingData, updateDrawingData } = useContext(DrawingDataContext);
   const { step, incrementStep } = useContext(UserFlowContext);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const handleAnalysis = async () => {
+    setIsLoading(true);
+    try {
+      console.log(JSON.stringify(drawingData).toString());
+      let test_params = JSON.stringify(drawingData).toString();
+      let req_str = "?params=" + test_params;
+      console.log(req_str);
+      let url = "http://127.0.0.1:5000/api/mapping";
+      const apiQueryString = url + req_str;
+      var response = await fetch(apiQueryString);
+
+      if (response.ok) {
+        var data = await response.json();
+        console.log(data);
+        setAnalysisResults(data);  // This will update the state in App.js
+      } else {
+        console.error('Error in API response');
+      }
+    } catch (error) {
+      console.error('Error during analysis:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -54,24 +78,14 @@ const ParameterSelection = () => {
         <option value={"annual"}>Annual</option>
         <option value={"none"}>None</option>
         </select>
-        <button className="btn btn-primary w-full mt-4" onClick={async () => {
-          console.log(JSON.stringify(drawingData).toString())
-          let test_params = JSON.stringify(drawingData).toString()
-          let req_str = "?params=" + test_params
-          console.log(req_str)
-          let url = "http://127.0.0.1:5000/api/mapping" 
-          const apiQueryString = url + req_str
-          var response = await fetch(apiQueryString);
-
-          if (response.ok) {
-
-
-          var data = await response.json()
-          console.log(data)}
-
-
-        }}>Run Analysis</button>
-        <button className="btn btn-primary w-full mt-4" onClick={() => {incrementStep(-1)}}>Go Back</button>
+        <button 
+        className={`btn btn-primary w-full mt-4 ${isLoading ? 'loading' : ''}`} 
+        onClick={handleAnalysis}
+        disabled={isLoading}
+      >
+        {isLoading ? 'Running Analysis...' : 'Run Analysis'}
+      </button>
+      <button className="btn btn-primary w-full mt-4" onClick={() => {incrementStep(-1)}}>Go Back</button>
     </div>
   )
 }
