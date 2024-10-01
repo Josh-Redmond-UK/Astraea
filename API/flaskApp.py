@@ -25,8 +25,13 @@ def generate_paths():
     # Store the full response for the stats endpoint
     last_analysis_result = response
     
+    gif_url = f"/gif?path={response['GifUrl']}"
+    png_urls = [f"/png?path={path}" for path in response['ImgUrls']]
+
     # Send the GIF file
-    return send_file(response['GifUrl'], mimetype='image/gif')
+    return jsonify({"gif_url": gif_url,
+        "png_urls": png_urls})
+
 
 @app.route('/api/stats', methods=['GET'])
 def get_stats():
@@ -38,6 +43,21 @@ def get_stats():
         "Stats": last_analysis_result['Stats'],
         "ImgUrls": last_analysis_result['ImgUrls']
     })
+
+@app.route('/api/png', methods=['GET'])
+def serve_png():
+    png_path = request.args.get('path')
+    return send_file(png_path, mimetype='image/png')
+
+@app.route('/api/gif', methods=['GET'])
+def serve_gif():
+    gif_path = request.args.get('path')
+    return send_file(gif_path, mimetype='image/gif')
+
+@app.route('/api/zip', methods=['GET'])
+def serve_zip():
+    zip_path = request.args.get('path')
+    return send_file(zip_path, mimetype='application/zip')
 
 
 @app.route('/api/mapping/download', methods=['GET'])

@@ -16,20 +16,39 @@ const ParameterSelection = ({ onAnalysisComplete }) => {
       let url = "http://127.0.0.1:5000/api";
 
       // First API call to get the GIF
-      const gifResponse = await fetch(`${url}/mapping?params=${params}`);
+      const response = await fetch(`${url}/mapping?params=${params}`);
+      if (!response.ok) throw new Error('Failed to fetch analysis data');
+      const data = await response.json();
+  
+      
+
+      const gifResponse = await fetch(`${url}/${data.gif_url}`);
       if (!gifResponse.ok) throw new Error('Failed to fetch GIF');
       const gifBlob = await gifResponse.blob();
       const gifUrl = URL.createObjectURL(gifBlob);
-
+  
       // Second API call to get the stats
       const statsResponse = await fetch(`${url}/stats`);
       if (!statsResponse.ok) throw new Error('Failed to fetch stats');
       const statsData = await statsResponse.json();
 
+      // Fetch PNGs
+      const pngPromises = data.png_urls.map(async (pngUrl) => {
+        console.log(`${url}/${pngUrl}`);
+        const pngResponse = await fetch(`${url}/${pngUrl}`);
+        if (!pngResponse.ok) throw new Error('Failed to fetch PNG');
+        const pngBlob = await pngResponse.blob();
+        return URL.createObjectURL(pngBlob);
+      });
+
+      const pngUrls = await Promise.all(pngPromises);
+
+
+
       // Combine the results and pass them to the parent component
       onAnalysisComplete({
         GifUrl: gifUrl,
-        ImgUrls: statsData.ImgUrls,
+        ImgUrls: pngUrls,
         Stats: statsData.Stats
       });
     } catch (error) {
@@ -80,7 +99,7 @@ const ParameterSelection = ({ onAnalysisComplete }) => {
         <p className='text-lg mt-4'>Aggregation Length</p>
         <select className="select select-bordered w-full max-w-xs" value={drawingData.agg_length} 
         onChange={e => updateDrawingData({agg_length:e.target.value})}>
-        <option disabled>Aggregation Length</option>
+        <option disabled selected>Aggregation Length</option>
         <option value={"monthly"}>Monthly</option>
         <option value={"annual"}>Annual</option>
         <option value={"none"}>None</option>

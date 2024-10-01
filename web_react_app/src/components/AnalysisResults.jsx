@@ -48,9 +48,9 @@ const AnalysisResults = ({ data, onBack }) => {
 
       <div>
         <h3 className="text-xl font-semibold mb-2">Individual Images</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="carousel rounded-box">
           {ImgUrls.map((url, index) => (
-            <img key={index} src={url} alt={`Analysis Image ${index + 1}`} className="w-full" />
+            <div class="carousel-item"><img key={index} src={url} alt={`Analysis Image ${index + 1}`} className="w-full" /></div>
           ))}
         </div>
       </div>
