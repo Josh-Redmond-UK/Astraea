@@ -7,7 +7,13 @@ import numpy as np
 from PIL import Image  
 import PIL  
 import json
+import tempfile
+import uuid
+import zipfile
 import numpy as np
+from PIL import Image, ImageDraw, ImageSequence
+
+TEMP_DIR = tempfile.gettempdir()
 
 
 def array_to_rbga(arr:np.ndarray) -> np.ndarray:
@@ -48,7 +54,7 @@ def get_download_requests(params:dict) -> list[str]:
 
 
     if params['agg_type'] != 'None' or params['agg_length'] != 'None':
-        collection = aggregate_collection(collection, params['agg_type'], params['agg_length'], params['start_date'], params['end_date'])
+        collection, dates = aggregate_collection(collection, params['agg_type'], params['agg_length'], params['start_date'], params['end_date'])
     
     collection = collection.map(lambda image: image.clip(coordsToROI(params['roi'])))
 
@@ -64,7 +70,7 @@ def get_download_requests(params:dict) -> list[str]:
     print(get_image_stats(collection.first(), geom=coordsToROI(params['roi'])).getInfo())
 
     urls = get_download_jobs(collection)
-    return urls
+    return urls, dates
 
 def process_images(image_paths:list[str]) -> list[str]:
     ''' Returns a list of paths to the processed images, converting them from tif to png format.'''
@@ -75,7 +81,7 @@ def process_images(image_paths:list[str]) -> list[str]:
         
         arr = tiff.imread(i)
         #arr = np.squeeze(np.stack([arr[:,:,j] for j in arr.shape[-1]]))
-        arr = lognormalise(arr)
+        arr = arr/np.max(arr)
         arr = float_to_int(arr)
 
         arr = array_to_rbga(arr)
@@ -85,12 +91,19 @@ def process_images(image_paths:list[str]) -> list[str]:
 
     return processed_paths
 
-def create_gif(image_paths:list[str]) -> str:
+def create_gif(image_paths:list[str], date_list=None) -> str:
     ''' Returns the path to the created gif.'''
 
     if len(image_paths) > 0:
         gif_path = image_paths[0][:-3] + 'gif'
         images = [PIL.Image.open(i) for i in image_paths]
+        if date_list:
+            for i, img in enumerate(images):
+                draw = ImageDraw.Draw(img)
+                draw.text((10, 10), date_list[i], fill=(255, 255, 255, 255))
+
+
+
         images[0].save(gif_path, save_all=True, append_images=images[1:], duration=500, loop=0)
         return gif_path
 
@@ -127,7 +140,7 @@ def handle_request(params:dict) -> dict:
     ''' Returns a dictionary of the results of the specified request.'''
 
     # Get the download requests
-    download_requests = get_download_requests(params)
+    download_requests, dates = get_download_requests(params)
 
     # Download the images
     image_paths = download_urls(download_requests, 'downloads')
@@ -135,12 +148,31 @@ def handle_request(params:dict) -> dict:
     processed_image_paths = process_images(image_paths)
 
     # Create the gif
-    gif_path = create_gif(processed_image_paths)
+    gif_path = create_gif(processed_image_paths, dates)
 
     # Generate the statistics
     stats = generate_statistics(image_paths)
+    
+    all_files_list = image_paths + processed_image_paths + [gif_path]
 
-    return {"ImgUrls":processed_image_paths, "GifUrl":gif_path, "Stats":stats}
+    zip_path = create_zip(all_files_list)
+
+    return {"ImgUrls":processed_image_paths, "GifUrl":gif_path, "Stats":stats, "ZipUrl":zip_path}
+
+def create_zip(image_paths):
+    # Generate a unique filename for the zip
+    zip_filename = f"{uuid.uuid4()}.zip"
+    zip_path = os.path.join(TEMP_DIR, zip_filename)
+    
+    with zipfile.ZipFile(zip_path, 'w') as zf:
+        for img_path in image_paths:
+            # Get the filename without the directory structure
+            filename = os.path.basename(img_path)
+            # Add file to the zip
+            zf.write(img_path, filename)
+    
+    return zip_path
+
 
 
 def format_response(response:dict) -> str:

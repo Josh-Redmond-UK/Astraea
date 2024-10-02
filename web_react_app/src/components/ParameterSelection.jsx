@@ -43,13 +43,19 @@ const ParameterSelection = ({ onAnalysisComplete }) => {
 
       const pngUrls = await Promise.all(pngPromises);
 
+      const zipResponse = await fetch(`${url}/${data.zip_url}`);
+      if (!zipResponse.ok) throw new Error('Failed to fetch Zip');
+      const zipBlob = await zipResponse.blob();
+      const zipUrl = URL.createObjectURL(zipBlob);
+
 
 
       // Combine the results and pass them to the parent component
       onAnalysisComplete({
         GifUrl: gifUrl,
         ImgUrls: pngUrls,
-        Stats: statsData.Stats
+        Stats: statsData.Stats,
+        ZipUrl: zipUrl
       });
     } catch (error) {
       console.error('Error during analysis:', error);

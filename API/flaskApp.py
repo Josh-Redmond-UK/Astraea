@@ -27,10 +27,11 @@ def generate_paths():
     
     gif_url = f"/gif?path={response['GifUrl']}"
     png_urls = [f"/png?path={path}" for path in response['ImgUrls']]
-
+    zip_url = f"/zip?path={response['ZipUrl']}"
     # Send the GIF file
     return jsonify({"gif_url": gif_url,
-        "png_urls": png_urls})
+        "png_urls": png_urls,
+        "zip_url": zip_url})
 
 
 @app.route('/api/stats', methods=['GET'])
