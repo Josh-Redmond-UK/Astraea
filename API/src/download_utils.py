@@ -79,6 +79,11 @@ def get_download_jobs(imagecollection: ee.ImageCollection) -> list[str]:
 
     # Initialize the list of download jobs
     job_idxs = list(range(num_images))
-    url_list =  [get_url(images, idx) for idx in job_idxs]
-
+    url_list = []
+    for idx in job_idxs:
+        try:
+            url_list.append(get_url(images, idx))
+        except:
+            pass
+        
     return url_list

@@ -1,6 +1,7 @@
 import ee
 from .date_time_utils import *
 from datetime import datetime
+import asyncio
 
 
 def get_BAIS2(image):
@@ -150,19 +151,25 @@ def aggregate_collection(image_collection:ee.imagecollection, aggregation_type:s
     match aggregation_length:
         case "monthly":
             image_collection = ee.ImageCollection([agg_func(image_collection.filterDate(month[0], month[1])).setDefaultProjection("EPSG:3857", scale=10) for month in get_months(start_date, end_date)])
+            dates = [d[0] for d in get_months(start_date, end_date)]
             #image_collection = ee.List(get_months(start_date, end_date)).map(lambda month: agg_func(image_collection.filterDate(month[0], month[1])))
         case "annual":
             #image_collection = ee.List(get_years(start_date, end_date)).map(lambda month: agg_func(image_collection.filterDate(month[0], month[1])))
             image_collection = ee.ImageCollection([agg_func(image_collection.filterDate(year[0], year[1])).setDefaultProjection("EPSG:3857", scale=10) for year in get_years(start_date, end_date)])
+            dates = [d[0] for d in get_years(start_date, end_date)]
+
         case "none":
             #print("No aggregation returning median for whole collection yolo") 
             image_collection = ee.ImageCollection([image_collection.median()])
+            dates = image_collection.reduceColumns(ee.Reducer.toList(), ['system:time_start']).getInfo()
+
+
         case _:
             raise ValueError(f'Aggregation length {aggregation_length} is not supported. Please use Monthly, Annual, or None.')
 
 
     
-    return image_collection
+    return image_collection, dates
 
 
 def numberOfPixels(img:ee.image):

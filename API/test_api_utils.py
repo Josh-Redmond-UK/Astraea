@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import ee
-from api_utils import *
+from src.api_utils import *
 ee.Initialize()
 
 class ApiUtilsTest(unittest.TestCase):

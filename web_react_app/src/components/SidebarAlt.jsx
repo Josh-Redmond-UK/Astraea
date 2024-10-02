@@ -1,9 +1,10 @@
-import React, { Component, useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import SearchOptions from './SearchOptions';
 import DrawControl from './DrawControl';
 import ParameterSelection from './ParameterSelection';
 import { UserFlowContext } from '../contexts/UserFlowContext';
-const SidebarAlt = () => {
+
+const SidebarAlt = ({ onAnalysisComplete }) => {
     const {step, incrementStep} = useContext(UserFlowContext);
     return (
         <div className="drawer lg:drawer-open">
@@ -14,7 +15,6 @@ const SidebarAlt = () => {
             <div className="drawer-side">
                 <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label> 
                 <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-                    {/* Sidebar content here */}
                     <h1 className="text-xl">Astraea</h1>
                     <ul className="steps">
                         <li className="step step-primary">Draw Polygon</li>
@@ -23,12 +23,14 @@ const SidebarAlt = () => {
                     </ul>
                     <div className="divider"></div>
                     {
-                        step === 1 ? <DrawControl/> : step === 2 ? <ParameterSelection /> : <SearchOptions />
+                        step === 1 ? <DrawControl/> : 
+                        step === 2 ? <ParameterSelection onAnalysisComplete={onAnalysisComplete} /> : 
+                        <SearchOptions />
                     }
                 </ul>
             </div>
         </div>
-  )
+    );
 }
 
-export default SidebarAlt
+export default SidebarAlt;
