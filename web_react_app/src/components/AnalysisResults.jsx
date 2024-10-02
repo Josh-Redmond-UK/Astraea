@@ -55,22 +55,23 @@ const AnalysisResults = ({ data, onBack }) => {
           ))}
         </div>
         <div class="divider"></div>
+        <div class="join">
 
-        <button
-          className="btn btn-primary"
+        <a
+          className="btn btn-primary join-item"
           href={ZipData.zip_url}
           download={ZipData.filename}
         >
           Download Zip File
-        </button>
+        </a>
 
         <button
           onClick={onBack}
-          className="btn btn-primary"
+          className="btn btn-primary join-item"
         >
           Back to Map
         </button>
-
+        </div>
       </div>
     </div>
   );
